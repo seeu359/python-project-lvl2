@@ -1,10 +1,6 @@
 import json
 
 
-a = '/Users/a1234/python-project-lvl2/gendiff/file1.json'
-b = '/Users/a1234/python-project-lvl2/gendiff/file2.json'
-
-
 def normalize_type(val):
     if type(val) is bool:
         value = str(val)
