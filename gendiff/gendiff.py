@@ -30,7 +30,7 @@ def generate_diff(path1, path2):
     for i in key_list:
         if (file1.get(i) is not None) and (file2.get(i) is not None):
             if file1[i] == file2[i]:
-                result += f'\t{i}: {normalize_type(file1[i])}\n'
+                result += f'    {i}: {normalize_type(file1[i])}\n'
             elif file1[i] != file2[i]:
                 result += f'  - {i}: {normalize_type(file1[i])}\n' \
                           f'  + {i}: {normalize_type(file2[i])}\n'
@@ -39,4 +39,3 @@ def generate_diff(path1, path2):
         elif (file1.get(i) is None) and (file2.get(i) is not None):
             result += f'  + {i}: {normalize_type(file2[i])}\n'
     return '{\n' + result + '}'
-
