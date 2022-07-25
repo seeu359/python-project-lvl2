@@ -11,6 +11,20 @@ def normalize_type(val):
         return val
 
 
+def sorting_keys(*array: list):
+    array_lists = [*array]
+    result = []
+    count_list = len(array_lists)
+    index = 0
+    while index < count_list:
+        for i in array_lists[index]:
+            if i not in result:
+                result.append(i)
+        index += 1
+    result.sort()
+    return result
+
+
 def open_file(path):
     with open(path) as file:
         return json.load(file)
@@ -19,14 +33,8 @@ def open_file(path):
 def generate_diff(path1, path2):
     file1 = open_file(path1)
     file2 = open_file(path2)
-    key_list = []
+    key_list = sorting_keys(file1, file2)
     result = ''
-    for key1 in file1.keys():
-        key_list.append(key1)
-    for key2 in file2.keys():
-        if key2 not in key_list:
-            key_list.append(key2)
-    key_list.sort()
     for i in key_list:
         if (file1.get(i) is not None) and (file2.get(i) is not None):
             if file1[i] == file2[i]:
