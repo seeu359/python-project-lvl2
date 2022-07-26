@@ -5,7 +5,7 @@ def normalize_type(val):
     if type(val) is bool:
         value = str(val)
         return value.lower()
-    elif type(val) is None:
+    elif val is None:
         return 'null'
     else:
         return val
@@ -36,14 +36,15 @@ def generate_diff(path1, path2):
     key_list = sorting_keys(file1, file2)
     result = ''
     for i in key_list:
-        if (file1.get(i) is not None) and (file2.get(i) is not None):
-            if file1[i] == file2[i]:
-                result += f'    {i}: {normalize_type(file1[i])}\n'
-            elif file1[i] != file2[i]:
-                result += f'  - {i}: {normalize_type(file1[i])}\n' \
-                          f'  + {i}: {normalize_type(file2[i])}\n'
-        elif (file1.get(i) is not None) and (file2.get(i) is None):
-            result += f'  - {i}: {normalize_type(file1[i])}\n'
-        elif (file1.get(i) is None) and (file2.get(i) is not None):
-            result += f'  + {i}: {normalize_type(file2[i])}\n'
+        first_key = file1.get(i)
+        second_key = file2.get(i)
+        if first_key == second_key:
+            result += f'    {i}: {normalize_type(first_key)}\n'
+        elif (first_key is not None) and (second_key is not None):
+            result += f'  - {i}: {normalize_type(file1[i])}\n' \
+                      f'  + {i}: {normalize_type(file2[i])}\n'
+        elif (first_key is not None) and (second_key is None):
+            result += f'  - {i}: {normalize_type(first_key)}\n'
+        elif (first_key is None) and (second_key is not None):
+            result += f'  + {i}: {normalize_type(second_key)}\n'
     return '{\n' + result + '}'
