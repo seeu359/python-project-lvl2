@@ -13,4 +13,4 @@ pyt:
 	pytest tests
 
 test-coverage:
-	coverage run -m pytest tests
+	poetry run pytest --cov=gendiff --cov-report xml tests/
