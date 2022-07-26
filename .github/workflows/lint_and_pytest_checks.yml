@@ -17,12 +17,12 @@ jobs:
         run: |
           pip install poetry
           make install
-      - name: Run lint
-        run: |
-            make lint
       - name: Run tests
         run: |
             make pyt
+      - name: Run lint
+        run: |
+            make lint
 
 
 
