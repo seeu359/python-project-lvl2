@@ -28,3 +28,4 @@ jobs:
         with:
           coverageCommand: make test-coverage
           debug: true
+        continue-on-error: true
