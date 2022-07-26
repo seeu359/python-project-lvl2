@@ -17,9 +17,14 @@ jobs:
         run: |
           pip install poetry
           make install
-      - name: Run tests
-        run: |
-            make pyt
-      - name: Run lint
+      - name: Run tests and lint
         run: |
             make lint
+            make pyt
+      - name: Test & publish code coverage
+        uses: paambaati/codeclimate-action@v2.7.4
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: make test-coverage
+          debug: true
