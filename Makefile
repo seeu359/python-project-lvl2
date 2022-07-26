@@ -10,4 +10,4 @@ lint:
 	poetry run flake8 gendiff
 
 pyt:
-	pytest
+	pytest tests
