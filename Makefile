@@ -11,3 +11,6 @@ lint:
 
 pyt:
 	pytest tests
+
+test-coverage:
+	coverage run -m pytest tests
