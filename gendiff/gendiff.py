@@ -1,4 +1,5 @@
 import json
+import yaml
 
 
 def normalize_type(val):
@@ -27,7 +28,10 @@ def sorting_keys(*array: list):
 
 def open_file(path):
     with open(path) as file:
-        return json.load(file)
+        if path.endswith('json'):
+            return json.load(file)
+        if path.endswith('yaml') or path.endswith('yml'):
+            return yaml.safe_load(file)
 
 
 def generate_diff(path1, path2):
