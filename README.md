@@ -5,3 +5,4 @@
 [![Code check](https://github.com/seeu359/python-project-lvl2/actions/workflows/lint_and_pytest_checks.yml/badge.svg)](https://github.com/seeu359/python-project-lvl2/actions/workflows/lint_and_pytest_checks.yml)
 
 <a href="https://asciinema.org/a/511274" target="_blank"><img src="https://asciinema.org/a/511274.svg" /></a>
+<a href="https://asciinema.org/a/511276" target="_blank"><img src="https://asciinema.org/a/511276.svg" /></a>
