@@ -1,8 +1,10 @@
-from gendiff.generate_diff import generate_diff
-from gendiff.formatter import stylish
+from gendiff.gen_diff import generate_diff
+from gendiff.formatters.stylish import stylish
+from gendiff.formatters.plain import plain
 
 RESULT_SIMPLE_FORMAT = open('tests/fixtures/result_simple_true.txt').read()
-RESULT_NESTED_FORMAT = open('tests/fixtures/result_nested_true.txt').read()
+RESULT_STYLISH_FORMAT = open('tests/fixtures/result_stylish_true.txt').read()
+RESULT_PLAIN_FORMAT = open('tests/fixtures/result_plain_true.txt').read()
 
 
 def test_generate_diff_simple():
@@ -23,5 +25,7 @@ def test_generate_diff_complex():
                                        'tests/fixtures/test_file_nested2.json')
     result_yaml_nested = generate_diff('tests/fixtures/test_file_nested1.yaml',
                                        'tests/fixtures/test_file_nested2.yaml')
-    assert stylish(result_json_nested) == RESULT_NESTED_FORMAT
-    assert stylish(result_yaml_nested) == RESULT_NESTED_FORMAT
+    assert stylish(result_json_nested) == RESULT_STYLISH_FORMAT
+    assert stylish(result_yaml_nested) == RESULT_STYLISH_FORMAT
+    assert plain(result_yaml_nested) == RESULT_PLAIN_FORMAT
+    assert plain(result_json_nested) == RESULT_PLAIN_FORMAT
