@@ -1,3 +1,6 @@
+from gendiff.generate_diff import generate_diff
+
+
 def normalize_type(value):
     if type(value) is bool:
         return str(value).lower()
@@ -19,7 +22,7 @@ def stylish(notion, replacer=' ', replacer_count=4):
                     result.append(f'{replacer*(replacer_count*data.get(key)[2]-2)}'
                                   f'{data.get(key)[1]} {key[4:]}: {{\n')
                 else:
-                    result.append(f'{replacer * (replacer_count * data.get(key)[2] - 2)}'
+                    result.append(f'{replacer * (replacer_count *  data.get(key)[2] - 2)}'
                                   f'{data.get(key)[1]} {key}: {{\n')
 
                 get_format(data.get(key)[0], result, indent + 1)
@@ -43,3 +46,8 @@ def stylish(notion, replacer=' ', replacer_count=4):
         result.append(replacer * replacer_count * indent + '}\n')
         return ''.join(result).strip()
     return get_format(notion, ['{\n'], 0)
+
+a = generate_diff('/Users/a1234/python-project-lvl2/tests/fixtures/test_file_nested1.json',
+                  '/Users/a1234/python-project-lvl2/tests/fixtures/test_file_nested2.json')
+
+print(stylish(a))
