@@ -1,4 +1,5 @@
-from gendiff.generate_diff import generate_diff
+REPLACER = ' '
+REPLACER_COUNT = 4
 
 
 def normalize_type(value):
@@ -15,39 +16,41 @@ def stylish(notion, replacer=' ', replacer_count=4):
     def get_format(data, result, indent):
         for key in data:
             if isinstance(data.get(key)[0], dict):
-                if data.get(key)[1] == '=' or data.get(key)[1] == 'NoAction':
-                    result.append(f'{replacer*replacer_count*data.get(key)[2]}'
-                                  f'{key}: {{\n')
-                elif key.startswith('REP-') or key.startswith('REP+'):
-                    result.append(f'{replacer*(replacer_count*data.get(key)[2]-2)}'
-                                  f'{data.get(key)[1]} {key[4:]}: {{\n')
-                else:
-                    result.append(f'{replacer * (replacer_count *  data.get(key)[2] - 2)}'
-                                  f'{data.get(key)[1]} {key}: {{\n')
-
+                result.append(formatting_dict(data, key))
                 get_format(data.get(key)[0], result, indent + 1)
             if not isinstance(data.get(key)[0], dict):
-                if key.startswith('REP+') or key.startswith('REP-'):
-                    if len(normalize_type(data.get(key)[0])) == 0:
-                        result.append(f'{replacer * (replacer_count * data.get(key)[2] - 2)}'
-                                      f'{data.get(key)[1]} {key[4:]}:'
-                                      f'{normalize_type(data.get(key)[0])}\n')
-                    else:
-                        result.append(f'{replacer * (replacer_count * data.get(key)[2] - 2)}'
-                                      f'{data.get(key)[1]} {key[4:]}: '
-                                      f'{normalize_type(data.get(key)[0])}\n')
-                elif (data.get(key)[1] == '=') or (data.get(key)[1] == 'NoAction'):
-                    result.append(f'{replacer * replacer_count * data.get(key)[2]}'
-                                  f'{key}: {normalize_type(data.get(key)[0])}\n')
-                elif data.get(key)[1] != '=':
-                    result.append(f'{replacer * (replacer_count * data.get(key)[2] - 2)}'
-                                  f'{   data.get(key)[1]} '
-                                  f'{key}: {normalize_type(data.get(key)[0]).strip()}\n')
+                result.append(formatting_not_dict(data, key))
         result.append(replacer * replacer_count * indent + '}\n')
         return ''.join(result).strip()
     return get_format(notion, ['{\n'], 0)
 
-a = generate_diff('/Users/a1234/python-project-lvl2/tests/fixtures/test_file_nested1.json',
-                  '/Users/a1234/python-project-lvl2/tests/fixtures/test_file_nested2.json')
 
-print(stylish(a))
+def formatting_dict(parent, key):
+    if parent.get(key)[1] == '=' or parent.get(key)[1] == 'NoAction':
+        return (f'{REPLACER * REPLACER_COUNT * parent.get(key)[2]}'
+                f'{key}: {{\n')
+    elif key.startswith('REP-') or key.startswith('REP+'):
+        return (f'{REPLACER * (REPLACER_COUNT * parent.get(key)[2] - 2)}'
+                f'{parent.get(key)[1]} {key[4:]}: {{\n')
+    else:
+        return (f'{REPLACER * (REPLACER_COUNT * parent.get(key)[2] - 2)}'
+                f'{parent.get(key)[1]} {key}: {{\n')
+
+
+def formatting_not_dict(parent, key):
+    if key.startswith('REP+') or key.startswith('REP-'):
+        if len(normalize_type(parent.get(key)[0])) == 0:
+            return f'{REPLACER * (REPLACER_COUNT * parent.get(key)[2] - 2)}' \
+                   f'{parent.get(key)[1]} {key[4:]}:' \
+                   f'{normalize_type(parent.get(key)[0])}\n'
+        else:
+            return f'{REPLACER * (REPLACER_COUNT * parent.get(key)[2] - 2)}' \
+                   f'{parent.get(key)[1]} {key[4:]}: ' \
+                   f'{normalize_type(parent.get(key)[0])}\n'
+    elif (parent.get(key)[1] == '=') or (parent.get(key)[1] == 'NoAction'):
+        return f'{REPLACER * REPLACER_COUNT * parent.get(key)[2]}' \
+               f'{key}: {normalize_type(parent.get(key)[0])}\n'
+    elif parent.get(key)[1] != '=':
+        return(f'{REPLACER * (REPLACER_COUNT * parent.get(key)[2] - 2)}'
+               f'{parent.get(key)[1]} '
+               f'{key}: {normalize_type(parent.get(key)[0]).strip()}\n')
