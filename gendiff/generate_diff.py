@@ -67,14 +67,15 @@ def complex_formatting(parent1, parent2, key, indent):
     if isinstance(parent1.get(key), dict) and\
             not isinstance(parent2.get(key), dict):
         result[f'REP-{key}'] = [not_formatting_search(parent1.get(key),
-                                                      indent + 1),
-                                '-', indent]
+                                                      indent + 1), '-', indent]
         result[f'REP+{key}'] = [parent2.get(key), '+', indent]
         return result
     elif not isinstance(parent1.get(key), dict) and\
             isinstance(parent2.get(key), dict):
-        result = [indent, '-', parent1.get(key),
-                  not_formatting_search(parent2.get(key), indent + 1)]
+        result[f'REP-{key}'] = [parent1.get(key), '-', indent]
+        result[f'REP+{key}'] = [not_formatting_search(parent2.get(key),
+                                                      indent + 1), '+', indent]
+
         return result
 
 
