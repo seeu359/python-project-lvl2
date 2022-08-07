@@ -1,7 +1,7 @@
-import secondary_functions
+from gendiff import secondary_functions
 
 
-def generate_diff(path1, path2):
+def generate_diff(path1, path2, format_name):
     file1 = secondary_functions.open_files(path1)
     file2 = secondary_functions.open_files(path2)
     result = dict()
@@ -13,15 +13,18 @@ def generate_diff(path1, path2):
             result[key] = [formatting_search(file1.get(key),
                                              file2.get(key)),
                            '=', indent]
-        if isinstance(file1.get(key), dict) and key not in file2:
+        elif isinstance(file1.get(key), dict) and key not in file2:
             result[key] = [not_formatting_search(file1.get(key),
                                                  indent + 1),
                            '-', indent]
-        if key not in file1 and isinstance(file2.get(key), dict):
+        elif key not in file1 and isinstance(file2.get(key), dict):
             result[key] = [not_formatting_search(file2.get(key),
                                                  indent + 1),
                            '+', indent]
-    return result
+        else:
+            value = formatting_search(file1, file2, indent)
+            result.update(value)
+    return format_name(result)
 
 
 def formatting_search(parent1, parent2, indent=2):
