@@ -1,6 +1,7 @@
 import json
 import yaml
 
+
 def have_key(parent1, parent2, key):
     if parent1.get(key) is not None:
         return [parent1, '-']
