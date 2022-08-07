@@ -8,9 +8,9 @@ from gendiff.formatters.plain import plain
 def main():
     args = parsers_data()
     if args.format == 'stylish':
-        return generate_diff(args.first_file, args.second_file, stylish)
+        print(generate_diff(args.first_file, args.second_file, stylish))
     if args.format == 'plain':
-        return generate_diff(args.first_file, args.second_file, plain)
+        print(generate_diff(args.first_file, args.second_file, plain))
 
 
 if __name__ == '__main__':
