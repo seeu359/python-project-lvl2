@@ -1,11 +1,14 @@
 ADDED = 'was added with value:'
 REMOVED = 'was removed'
 UPDATED = 'was updated. From'
+COMPLEX = '[complex value]'
 
 
 def normalize_type(value):
-    if type(value) is bool:
+    if isinstance(value, bool):
         return f"{str(value).lower()}"
+    elif isinstance(value, int):
+        return str(value)
     elif value is None:
         return 'null'
     else:
@@ -32,13 +35,13 @@ def formatting_dict(data, key, path):
     if data.get(key)[1] == '-':
         if key.startswith('REP-'):
             return (f"Property '{path}{key[4:]}' "
-                    f"{UPDATED} [complex value] to ")
+                    f"{UPDATED} {COMPLEX} to ")
         else:
             return f"Property '{path}{key}' {REMOVED}\n"
     elif key.startswith('REP+'):
-        return '[complex value]\n'
+        return f"{COMPLEX}\n"
     elif data.get(key)[1] == '+':
-        return f"Property '{path}{key}' {ADDED} [complex value]\n"
+        return f"Property '{path}{key}' {ADDED} {COMPLEX}\n"
 
 
 def formatting_not_dict(data, key, path):
