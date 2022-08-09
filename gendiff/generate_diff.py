@@ -5,11 +5,11 @@ from gendiff.formatters.plain import plain
 
 
 formatter_selection = {'stylish': stylish,
-             'json': json,
-             'plain': plain}
+                       'json': json,
+                       'plain': plain}
 
 
-def generate_diff(path1, path2, format_name=formatter_selection['stylish']):
+def generate_diff(path1, path2, format_name='stylish'):
     file1 = secondary_functions.open_files(path1)
     file2 = secondary_functions.open_files(path2)
     result = dict()
@@ -32,7 +32,7 @@ def generate_diff(path1, path2, format_name=formatter_selection['stylish']):
         else:
             value = formatting_search(file1, file2, indent)
             result.update(value)
-    return format_name(result)
+    return formatter_selection[format_name](result)
 
 
 def formatting_search(parent1, parent2, indent=2):
