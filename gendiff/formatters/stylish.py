@@ -41,14 +41,9 @@ def formatting_dict(parent, key):
 
 def formatting_not_dict(parent, key):
     if key.startswith(OLD_KEY_VALUE) or key.startswith(UPDATED_KEY_VALUE):
-        if len(normalize_type(parent.get(key)[0])) == 0:
-            return f'{REPLACER * (REPLACER_COUNT * parent.get(key)[2] - 2)}' \
-                   f'{parent.get(key)[1]} {key[4:]}:' \
-                   f'{normalize_type(parent.get(key)[0])}\n'
-        else:
-            return f'{REPLACER * (REPLACER_COUNT * parent.get(key)[2] - 2)}' \
-                   f'{parent.get(key)[1]} {key[4:]}: ' \
-                   f'{normalize_type(parent.get(key)[0])}\n'
+        return f'{REPLACER * (REPLACER_COUNT * parent.get(key)[2] - 2)}' \
+               f'{parent.get(key)[1]} {key[4:]}: ' \
+               f'{normalize_type(parent.get(key)[0])}\n'
     elif (parent.get(key)[1] == '=') or (parent.get(key)[1] == 'NoAction'):
         return f'{REPLACER * REPLACER_COUNT * parent.get(key)[2]}' \
                f'{key}: {normalize_type(parent.get(key)[0])}\n'
