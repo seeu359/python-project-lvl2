@@ -20,7 +20,7 @@ def json(data):
     def get_format(notion, result, indent):
         for key in notion:
             if isinstance(notion.get(key)[0], dict):
-                result.append(formatting_dict1(notion, key))
+                result.append(formatting_dict(notion, key))
                 get_format(notion.get(key)[0], result, indent + 1)
             elif not isinstance(notion.get(key)[0], dict):
                 result.append(formatting_not_dict(notion, key))
@@ -29,16 +29,15 @@ def json(data):
     return get_format(data, ['{\n'], 1)
 
 
-def formatting_dict1(data, key):
-    options = {'-': f'{INDENT * data.get(key)[2]}"{key}"-: {{\n',
-               '+': f'{INDENT * data.get(key)[2]}"{key}"+: {{\n',
-               '=': f'{INDENT * data.get(key)[2]}"{key}": {{\n'
+def formatting_dict(data, key):
+    options = {'-': f'{INDENT * data.get(key)[2]}"-{key}": {{\n',
+               '+': f'{INDENT * data.get(key)[2]}"+{key}": {{\n',
+               '=': f'{INDENT * data.get(key)[2]}"={key}": {{\n'
                }
     if key.startswith(OLD_KEY_VALUE):
-        return f'{INDENT * data.get(key)[2]}"{key[4:]}"-: {{\n'
+        return f'{INDENT * data.get(key)[2]}"-{key[4:]}": {{\n'
     elif key.startswith(UPDATED_KEY_VALUE):
-        return f'{INDENT * data.get(key)[2]}"{key[4:]}"+: ' \
-               f'"{normalize_type(data.get(key)[0])}"\n'
+        return f'{INDENT * data.get(key)[2]}"+{key[4:]}": {{\n'
     elif data.get(key)[1] == NOT_FORMAT:
         return f'{INDENT * data.get(key)[2]}"{key}": {{\n'
     else:
@@ -46,28 +45,29 @@ def formatting_dict1(data, key):
 
 
 def formatting_not_dict(data, key):
-    options = {'-': f'{INDENT * data.get(key)[2]}"{key}"-:'
+    options = {'-': f'{INDENT * data.get(key)[2]}"-{key}": '
                     f'{normalize_type(data.get(key)[0])} \n',
-               '+': f'{INDENT * data.get(key)[2]}"{key}"+:'
+               '+': f'{INDENT * data.get(key)[2]}"+{key}": '
                     f'{normalize_type(data.get(key)[0])}\n',
-               '=': f'{INDENT * data.get(key)[2]}"{key}": '
-                    f'{data.get(key)[0]}\n'
+               '=': f'{INDENT * data.get(key)[2]}"={key}": '
+                    f'{normalize_type(data.get(key)[0])}\n'
                }
     if key.startswith(OLD_KEY_VALUE):
-        return f'{INDENT * data.get(key)[2]}"{key[4:]}"-: ' \
+        return f'{INDENT * data.get(key)[2]}"-{key[4:]}": ' \
                f'{normalize_type(data.get(key)[0])}\n'
     elif key.startswith(UPDATED_KEY_VALUE):
-        return f'{INDENT * data.get(key)[2]}"{key[4:]}"+: ' \
+        return f'{INDENT * data.get(key)[2]}"+{key[4:]}": ' \
                f'{normalize_type(data.get(key)[0])}\n'
     elif data.get(key)[1] == NOT_FORMAT:
         return f'{INDENT * data.get(key)[2]}"{key}": ' \
-               f'"{normalize_type(data.get(key)[0])}"\n'
+               f'{normalize_type(data.get(key)[0])}\n'
     else:
         return options[data.get(key)[1]]
 
 
 def formatting_unchanged_key(data, key):
-    return f'{INDENT * data.get(key)[2]}"{key}": {data.get(key)[0]}\n'
+    return f'{INDENT * data.get(key)[2]}"{key}": ' \
+           f'{normalize_type(data.get(key)[0])}\n'
 
 
 def formatting_unchanged_dict(data, key):

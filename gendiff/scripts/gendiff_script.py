@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from gendiff import generate_diff
 from gendiff.parser import parsers_data
-from gendiff.generate_diff import formatter_selection
 
 
 def main():
