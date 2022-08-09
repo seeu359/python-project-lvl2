@@ -25,8 +25,6 @@ gendiff_formatting2_nested2 = \
                   'tests/fixtures/test_file_nested2.yaml', plain)
 
 
-
-
 def test_generate_diff_simple():
     result_stylish_simple = gendiff_formatting_simple1
     result_plain_simple = gendiff_formatting_simple2
