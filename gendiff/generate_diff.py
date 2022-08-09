@@ -1,7 +1,8 @@
 from gendiff import secondary_functions
+from gendiff.formatters.stylish import stylish
 
 
-def generate_diff(path1, path2, format_name):
+def generate_diff(path1, path2, format_name=stylish):
     file1 = secondary_functions.open_files(path1)
     file2 = secondary_functions.open_files(path2)
     result = dict()
