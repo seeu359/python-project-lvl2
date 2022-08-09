@@ -1,8 +1,15 @@
 from gendiff import secondary_functions
 from gendiff.formatters.stylish import stylish
+from gendiff.formatters.json import json
+from gendiff.formatters.plain import plain
 
 
-def generate_diff(path1, path2, format_name=stylish):
+formatter_selection = {'stylish': stylish,
+             'json': json,
+             'plain': plain}
+
+
+def generate_diff(path1, path2, format_name=formatter_selection['stylish']):
     file1 = secondary_functions.open_files(path1)
     file2 = secondary_functions.open_files(path2)
     result = dict()
