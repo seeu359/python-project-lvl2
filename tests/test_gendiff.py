@@ -54,4 +54,3 @@ def test_generate_diff_complex():
     assert result_plain_nested == RESULT_NESTED_PLAIN
     assert result_stylish_nested2 == RESULT_NESTED_STYLISH2
     assert result_plain_nested2 == RESULT_NESTED_PLAIN2
-    

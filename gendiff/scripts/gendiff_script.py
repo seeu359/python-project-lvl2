@@ -7,11 +7,11 @@ def main():
     args = parsers_data()
     if args.format == 'json':
         print(generate_diff(args.first_file, args.second_file,
-                             'json'))
-    if args.format == 'plain':
+                            'json'))
+    elif args.format == 'plain':
         print(generate_diff(args.first_file, args.second_file,
-                             'plain'))
-    else:
+                            'plain'))
+    elif args.format == 'stylish':
         print(generate_diff(args.first_file, args.second_file))
 
 
