@@ -27,7 +27,7 @@ def json(data):
             elif not isinstance(notion.get(key)[0], dict):
                 result.append(formatting_not_dict(notion, key))
         result[-1] = result[-1][:-2]
-        result.append(f'}}, ')
+        result.append('}, ')
         return ''.join(result).strip()[:-1]
     return get_format(data, ['{'], 1)
 
