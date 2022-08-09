@@ -1,5 +1,5 @@
 from gendiff.generate_diff import generate_diff
-
+import json
 
 RESULT_SIMPLE_STYLISH = open('tests/fixtures/result_stylish_simple.txt').read()
 RESULT_SIMPLE_PLAIN = open('tests/fixtures/result_plain_simple').read()
@@ -32,6 +32,10 @@ gendiff_formatting_nested4 = \
     generate_diff('tests/fixtures/test_file_nested3.json',
                   'tests/fixtures/test_file_nested4.json', 'plain')
 
+gendiff_formatting_nested5 = \
+    generate_diff('tests/fixtures/test_file_nested3.json',
+                  'tests/fixtures/test_file_nested4.json', 'json')
+
 
 def test_generate_diff_simple():
     result_stylish_simple = gendiff_formatting_simple1
@@ -45,7 +49,9 @@ def test_generate_diff_complex():
     result_plain_nested = gendiff_formatting2_nested2
     result_stylish_nested2 = gendiff_formatting_nested3
     result_plain_nested2 = gendiff_formatting_nested4
+    result_json = json.loads(gendiff_formatting_nested5)
     assert result_stylish_nested == RESULT_NESTED_STYLISH
     assert result_plain_nested == RESULT_NESTED_PLAIN
     assert result_stylish_nested2 == RESULT_NESTED_STYLISH2
     assert result_plain_nested2 == RESULT_NESTED_PLAIN2
+    
