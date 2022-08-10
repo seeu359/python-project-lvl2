@@ -4,8 +4,7 @@ UPDATED = 'was updated. From'
 COMPLEX = '[complex value]'
 OLD_KEY_VALUES = 'REP-'
 UPDATED_KEY_VALUES = 'REP+'
-RESULT = list()
-PATH = ''
+RESULT = []
 
 
 def format_reduction(value):
@@ -31,13 +30,12 @@ def plain(notion):
                 result.append(formatting_not_dict(data, key, path))
         return ''.join(result).strip()
 
-    return distributing_values(notion, RESULT, PATH)
+    return distributing_values(notion, RESULT, '')
 
 
 def formatting_dict(data, key, path):
     if data.get(key)[1] == '-' and key.startswith(OLD_KEY_VALUES):
-        return (f"Property '{path}{key[4:]}' "
-                f"{UPDATED} {COMPLEX} to ")
+        return f"Property '{path}{key[4:]}' {UPDATED} {COMPLEX} to "
     elif data.get(key)[1] == '-':
         return f"Property '{path}{key}' {REMOVED}\n"
     elif key.startswith(UPDATED_KEY_VALUES):

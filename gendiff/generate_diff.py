@@ -1,19 +1,19 @@
-from gendiff import secondary_functions
-from gendiff.formatters import stylish
-from gendiff.formatters import json
-from gendiff.formatters import plain
+from gendiff.secondary_functions import open_files, is_not_dictionary, sorting_keys, have_key
+from gendiff.formatters.stylish import stylish
+from gendiff.formatters.json import json
+from gendiff.formatters.plain import plain
 
 
-formatter_selection = {'stylish': stylish.stylish,
-                       'json': json.json,
-                       'plain': plain.plain}
+formatter_selection = {'stylish': stylish,
+                       'json': json,
+                       'plain': plain}
 
 
 def generate_diff(path1, path2, format_name='stylish'):
-    file1 = secondary_functions.open_files(path1)
-    file2 = secondary_functions.open_files(path2)
+    file1 = open_files(path1)
+    file2 = open_files(path2)
     result = dict()
-    keys_list = secondary_functions.sorting_keys(file1, file2)
+    keys_list = sorting_keys(file1, file2)
     indent = 1
     for key in keys_list:
         if isinstance(file1.get(key), dict) and \
@@ -37,10 +37,10 @@ def generate_diff(path1, path2, format_name='stylish'):
 
 def formatting_search(parent1, parent2, indent=2):
     result = dict()
-    keys_list = secondary_functions.sorting_keys(parent1, parent2)
+    keys_list = sorting_keys(parent1, parent2)
     for key in keys_list:
         if key in parent1 and key in parent2:
-            if secondary_functions.is_not_dictionary(parent1.get(key),
+            if is_not_dictionary(parent1.get(key),
                                                      parent2.get(key)):
                 value = simple_formatting(parent1, parent2, key, indent)
                 result.update(value)
@@ -53,7 +53,7 @@ def formatting_search(parent1, parent2, indent=2):
                 value = complex_formatting(parent1, parent2, key, indent)
                 result.update(value)
         else:
-            result[key] = formatting_search3(secondary_functions.have_key
+            result[key] = formatting_search3(have_key
                                              (parent1, parent2, key),
                                              indent, key)
     return result
@@ -89,7 +89,7 @@ def complex_formatting(parent1, parent2, key, indent):
 
 def not_formatting_search(parent, indent):
     result = dict()
-    keys_list = secondary_functions.sorting_keys(parent)
+    keys_list = sorting_keys(parent)
     for key in keys_list:
         if not isinstance(parent.get(key), dict):
             result[key] = ([parent.get(key), 'NoAction', indent])
