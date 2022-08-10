@@ -55,3 +55,5 @@ def test_generate_diff_complex():
     assert result_stylish_nested2 == RESULT_NESTED_STYLISH2
     assert result_plain_nested2 == RESULT_NESTED_PLAIN2
     assert isinstance(result_json, dict) is True
+    assert result_json['=common']['=setting1'] == 'Value 1'
+    assert isinstance(result_json['=group1']['-nest'], dict) is True
