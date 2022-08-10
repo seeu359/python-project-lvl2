@@ -2,9 +2,13 @@ ADDED = 'was added with value:'
 REMOVED = 'was removed'
 UPDATED = 'was updated. From'
 COMPLEX = '[complex value]'
+OLD_KEY_VALUES = 'REP-'
+UPDATED_KEY_VALUES = 'REP+'
+RESULT = list()
+PATH = ''
 
 
-def normalize_type(value):
+def format_reduction(value):
     if isinstance(value, bool):
         return f"{str(value).lower()}"
     elif isinstance(value, int):
@@ -17,28 +21,26 @@ def normalize_type(value):
 
 def plain(notion):
 
-    def get_format(data, result, path):
+    def distributing_values(data, result, path):
         for key in data:
-            if isinstance(data.get(key)[0], dict):
-                if data.get(key)[1] == '=':
-                    get_format(data.get(key)[0], result, path + f'{key}.')
-                else:
-                    result.append(formatting_dict(data, key, path))
+            if isinstance(data.get(key)[0], dict) and data.get(key)[1] == '=':
+                distributing_values(data.get(key)[0], result, path + f'{key}.')
+            elif isinstance(data.get(key)[0], dict) and data.get(key)[1] != '=':
+                result.append(formatting_dict(data, key, path))
             if not isinstance(data.get(key)[0], dict):
                 result.append(formatting_not_dict(data, key, path))
         return ''.join(result).strip()
 
-    return get_format(notion, [], '')
+    return distributing_values(notion, RESULT, PATH)
 
 
 def formatting_dict(data, key, path):
-    if data.get(key)[1] == '-':
-        if key.startswith('REP-'):
-            return (f"Property '{path}{key[4:]}' "
-                    f"{UPDATED} {COMPLEX} to ")
-        else:
-            return f"Property '{path}{key}' {REMOVED}\n"
-    elif key.startswith('REP+'):
+    if data.get(key)[1] == '-' and key.startswith(OLD_KEY_VALUES):
+        return (f"Property '{path}{key[4:]}' "
+                f"{UPDATED} {COMPLEX} to ")
+    elif data.get(key)[1] == '-':
+        return f"Property '{path}{key}' {REMOVED}\n"
+    elif key.startswith(UPDATED_KEY_VALUES):
         return f"{COMPLEX}\n"
     elif data.get(key)[1] == '+':
         return f"Property '{path}{key}' {ADDED} {COMPLEX}\n"
@@ -47,12 +49,12 @@ def formatting_dict(data, key, path):
 def formatting_not_dict(data, key, path):
     if key.startswith('REP-'):
         return f"Property '{path}{key[4:]}' {UPDATED}" \
-               f" {normalize_type(data.get(key)[0])} to "
+               f" {format_reduction(data.get(key)[0])} to "
     elif key.startswith('REP+'):
-        return f"{normalize_type(data.get(key)[0])}\n"
+        return f"{format_reduction(data.get(key)[0])}\n"
     elif data.get(key)[1] == '+':
         return f"Property '{path}{key}' {ADDED}" \
-               f" {normalize_type(data.get(key)[0])}\n"
+               f" {format_reduction(data.get(key)[0])}\n"
     elif data.get(key)[1] == '-':
         return f"Property '{path}{key}' {REMOVED}\n"
     else:
