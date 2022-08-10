@@ -1,11 +1,11 @@
 from gendiff import secondary_functions
 from gendiff.formatters import stylish
-from gendiff.formatters import jsonf
+from gendiff.formatters import json
 from gendiff.formatters import plain
 
 
 formatter_selection = {'stylish': stylish.stylish,
-                       'json': jsonf.json,
+                       'json': json.json,
                        'plain': plain.plain}
 
 
