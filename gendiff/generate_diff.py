@@ -1,12 +1,12 @@
 from gendiff import secondary_functions
-from gendiff.formatters.stylish import stylish
-from gendiff.formatters.json import json
-from gendiff.formatters.plain import plain
+from gendiff.formatters import stylish
+from gendiff.formatters import jsonf
+from gendiff.formatters import plain
 
 
-formatter_selection = {'stylish': stylish,
-                       'json': json,
-                       'plain': plain}
+formatter_selection = {'stylish': stylish.stylish,
+                       'json': jsonf.json,
+                       'plain': plain.plain}
 
 
 def generate_diff(path1, path2, format_name='stylish'):
