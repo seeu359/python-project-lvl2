@@ -4,7 +4,6 @@ UPDATED = 'was updated. From'
 COMPLEX = '[complex value]'
 OLD_KEY_VALUES = 'REP-'
 UPDATED_KEY_VALUES = 'REP+'
-RESULT = []
 
 
 def format_reduction(value):

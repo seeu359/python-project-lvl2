@@ -1,4 +1,4 @@
-from gendiff.trying import secondary_functions
+from gendiff import secondary_functions
 from gendiff.formatters.stylish import stylish
 from gendiff.formatters.json_format import jsonf
 from gendiff.formatters.plain import plain
