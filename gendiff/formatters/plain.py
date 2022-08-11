@@ -29,12 +29,11 @@ def plain(notion):
             if not isinstance(data.get(key)[0], dict):
                 result.append(formatting_not_dict(data, key, path))
         return ''.join(result).strip()
-
-    return distributing_values(notion, RESULT, '')
+    return distributing_values(notion, [], '')
 
 
 def formatting_dict(data, key, path):
-    if data.get(key)[1] == '-' and key.startswith(OLD_KEY_VALUES):
+    if key.startswith(OLD_KEY_VALUES):
         return f"Property '{path}{key[4:]}' {UPDATED} {COMPLEX} to "
     elif data.get(key)[1] == '-':
         return f"Property '{path}{key}' {REMOVED}\n"

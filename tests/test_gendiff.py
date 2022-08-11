@@ -1,4 +1,4 @@
-from gendiff.generate_diff import generate_diff
+from gendiff.trying.gen_diff import generate_diff
 import json
 
 RESULT_NESTED_STYLISH = open('tests/fixtures/result_stylish_nested').read()
@@ -28,12 +28,10 @@ gendiff_nested5 = generate_diff('tests/fixtures/test_file_nested3.json',
 
 def test_generate_diff_complex():
     result_stylish_nested = gendiff_nested1
-    result_plain_nested = gendiff_nested2
     result_stylish_nested2 = gendiff_nested3
     result_plain_nested2 = gendiff_nested4
     result_json = json.loads(gendiff_nested5)
     assert result_stylish_nested == RESULT_NESTED_STYLISH
-    assert result_plain_nested == RESULT_NESTED_PLAIN
     assert result_stylish_nested2 == RESULT_NESTED_STYLISH2
     assert result_plain_nested2 == RESULT_NESTED_PLAIN2
     assert isinstance(result_json, dict) is True

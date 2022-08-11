@@ -17,7 +17,7 @@ def normalize_type(value):
         return f'"{value}"'
 
 
-def json(data):
+def jsonf(data):
 
     def get_format(notion, result, indent):
         for key in notion:
