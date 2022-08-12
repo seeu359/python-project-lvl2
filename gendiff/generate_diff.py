@@ -1,110 +1,57 @@
+"""
+The module compares 2 files () and returns a dictionary with an internal
+representation of each key. The value of each key is a list of the form:
+list[0] = the actual value of the key
+list[1] = modification type
+    if list[1] == '=': The value of the key has either not changed,
+    or the key is a paren that is also present in the second file
+    if list[1] == '+': The key has been added in the second file
+    if list[1] == '-': Key has been removed in the second file
+    If the key is present in both files, but its value in the second file has
+    changed, 2 keys are output, the first one starts with 'REP-{key}' and
+    represents the value of the first file, the second with 'REP+{key}' and
+    represents the updated value.
+list[2] = The parent of the current node.
+    If the node is the root - the value is an empty string
+"""
+
 from gendiff import secondary_functions
 from gendiff.formatters.stylish import stylish
 from gendiff.formatters.json_format import json
 from gendiff.formatters.plain import plain
-
 
 formatter_selection = {'stylish': stylish,
                        'json': json,
                        'plain': plain}
 
 
-def generate_diff(path1, path2, format_name='stylish'):
-    file1 = secondary_functions.open_files(path1)
-    file2 = secondary_functions.open_files(path2)
+def generate_diff(file1, file2, format_name='stylish'):
+    """
+    :param file1: type(file1) == str. Path to file1
+    :param file2: type(file2) == str. Path to file2
+    :param format_name: type(format_name) == str. Choice of the formatter.
+    Default formatter == stylish.
+    :return: type dict
+    """
+    file_1 = secondary_functions.open_files(file1)
+    file_2 = secondary_functions.open_files(file2)
     result = dict()
-    keys_list = secondary_functions.sorting_keys(file1, file2)
-    indent = 1
+    keys_list = secondary_functions.sorting_keys(file_1, file_2)
+    parent = ''
     for key in keys_list:
-        if isinstance(file1.get(key), dict) and \
-                isinstance(file2.get(key), dict):
-            result[key] = [formatting_search(file1.get(key),
-                                             file2.get(key)),
-                           '=', indent]
-        elif isinstance(file1.get(key), dict) and key not in file2:
-            result[key] = [not_formatting_search(file1.get(key),
-                                                 indent + 1),
-                           '-', indent]
-        elif key not in file1 and isinstance(file2.get(key), dict):
-            result[key] = [not_formatting_search(file2.get(key),
-                                                 indent + 1),
-                           '+', indent]
+        if isinstance(file_1.get(key), dict) and \
+                isinstance(file_2.get(key), dict):
+            result[key] = [secondary_functions.formatting_parent
+                           (file_1.get(key), file_2.get(key),
+                            parent + key), '=', parent]
+        if isinstance(file_1.get(key), dict) and key not in file_2:
+            result[key] = [secondary_functions.processing_without_format
+                           (file_1.get(key), f'{parent}{key}'), '-', parent]
+        if key not in file_1 and isinstance(file_2.get(key), dict):
+            result[key] = [secondary_functions.processing_without_format
+                           (file_2.get(key), f'{parent}{key}'), '+', parent]
         else:
-            value = formatting_search(file1, file2, indent)
+            value = secondary_functions.formatting_parent(file_1,
+                                                          file_2, parent)
             result.update(value)
     return formatter_selection[format_name](result)
-
-
-def formatting_search(parent1, parent2, indent=2):
-    result = dict()
-    keys_list = secondary_functions.sorting_keys(parent1, parent2)
-    for key in keys_list:
-        if key in parent1 and key in parent2:
-            if secondary_functions.is_not_dictionary(parent1.get(key),
-                                                     parent2.get(key)):
-                value = simple_formatting(parent1, parent2, key, indent)
-                result.update(value)
-            elif isinstance(parent1.get(key), dict) \
-                    and isinstance(parent2.get(key), dict):
-                result[key] = [formatting_search(parent1.get(key),
-                                                 parent2.get(key),
-                                                 indent + 1), '=', indent]
-            else:
-                value = complex_formatting(parent1, parent2, key, indent)
-                result.update(value)
-        else:
-            result[key] = formatting_search3(secondary_functions.have_key
-                                             (parent1, parent2, key),
-                                             indent, key)
-    return result
-
-
-def simple_formatting(parent1, parent2, key, indent):
-    result = dict()
-    if parent1[key] == parent2[key]:
-        result[key] = [parent1.get(key), '=', indent]
-        return result
-    elif parent1[key] != parent2[key]:
-        result[f'REP-{key}'] = [parent1.get(key), '-', indent]
-        result[f'REP+{key}'] = [parent2.get(key), '+', indent]
-        return result
-
-
-def complex_formatting(parent1, parent2, key, indent):
-    result = dict()
-    if isinstance(parent1.get(key), dict) and\
-            not isinstance(parent2.get(key), dict):
-        result[f'REP-{key}'] = [not_formatting_search(parent1.get(key),
-                                                      indent + 1), '-', indent]
-        result[f'REP+{key}'] = [parent2.get(key), '+', indent]
-        return result
-    elif not isinstance(parent1.get(key), dict) and\
-            isinstance(parent2.get(key), dict):
-        result[f'REP-{key}'] = [parent1.get(key), '-', indent]
-        result[f'REP+{key}'] = [not_formatting_search(parent2.get(key),
-                                                      indent + 1), '+', indent]
-
-        return result
-
-
-def not_formatting_search(parent, indent):
-    result = dict()
-    keys_list = secondary_functions.sorting_keys(parent)
-    for key in keys_list:
-        if not isinstance(parent.get(key), dict):
-            result[key] = ([parent.get(key), 'NoAction', indent])
-        elif isinstance(parent.get(key), dict):
-            result[key] = [not_formatting_search(parent.get(key),
-                                                 indent + 1),
-                           'NoAction', indent]
-    return result
-
-
-def formatting_search3(parent, indent, key):
-    if not isinstance(parent[0].get(key), dict):
-        return [parent[0].get(key), parent[1], indent]
-    if isinstance(parent[0].get(key), dict):
-        result = [not_formatting_search(parent[0].get(key),
-                                        indent + 1),
-                  parent[1], indent]
-        return result

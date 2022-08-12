@@ -46,16 +46,16 @@ def stylish(represent):
     def distributing_keys(node, result, indent):
         for key in node:
             if isinstance(node.get(key)[0], dict):
-                result.append(formatting_parent(node, key))
+                result.append(formatting_parent(node, key, indent))
                 distributing_keys(node.get(key)[0], result, indent + 1)
             if not isinstance(node.get(key)[0], dict):
-                result.append(formatting_child(node, key))
-        result.append(REPLACER * REPLACER_COUNT * indent + '}\n')
+                result.append(formatting_child(node, key, indent))
+        result.append(REPLACER * REPLACER_COUNT * (indent - 1) + '}\n')
         return ''.join(result).strip()
-    return distributing_keys(represent, ['{\n'], 0)
+    return distributing_keys(represent, ['{\n'], 1)
 
 
-def formatting_parent(node, key):
+def formatting_parent(node, key, indent):
     """
     Takes control from the parent. The difference is displayed as one of the
     characters before the key.The '+' sign indicates that the node was added
@@ -64,20 +64,21 @@ def formatting_parent(node, key):
     structure has changed
     :param node: type(node) == dict
     :param key: type(key) == str
+    :param indent: type(indent) == int
     :return: type str
     """
     if node.get(key)[1] == '=' or node.get(key)[1] == NO_ACTION:
-        return (f'{REPLACER * REPLACER_COUNT * node.get(key)[2]}'
+        return (f'{REPLACER * REPLACER_COUNT * indent}'
                 f'{key}: {{\n')
     elif key.startswith(OLD_KEY_VALUE) or key.startswith(UPDATED_KEY_VALUE):
-        return (f'{REPLACER * (REPLACER_COUNT * node.get(key)[2] - 2)}'
+        return (f'{REPLACER * (REPLACER_COUNT * indent - 2)}'
                 f'{node.get(key)[1]} {key[4:]}: {{\n')
     else:
-        return (f'{REPLACER * (REPLACER_COUNT * node.get(key)[2] - 2)}'
+        return (f'{REPLACER * (REPLACER_COUNT * indent - 2)}'
                 f'{node.get(key)[1]} {key}: {{\n')
 
 
-def formatting_child(node, key):
+def formatting_child(node, key, indent):
     """
     Takes control if key value is not a dictionary. Returns a key preceded by a
     key character that indicates changes made to the given key.
@@ -88,16 +89,17 @@ def formatting_child(node, key):
     second file.
     :param node: type(node) == dict
     :param key: type(key) == str
+    :param indent: type(indent) == int
     :return: type str
     """
     if key.startswith(OLD_KEY_VALUE) or key.startswith(UPDATED_KEY_VALUE):
-        return f'{REPLACER * (REPLACER_COUNT * node.get(key)[2] - 2)}' \
+        return f'{REPLACER * (REPLACER_COUNT * indent - 2)}' \
                f'{node.get(key)[1]} {key[4:]}: ' \
                f'{normalize_type(node.get(key)[0])}\n'
     elif (node.get(key)[1] == '=') or (node.get(key)[1] == NO_ACTION):
-        return f'{REPLACER * REPLACER_COUNT * node.get(key)[2]}' \
+        return f'{REPLACER * REPLACER_COUNT * indent}' \
                f'{key}: {normalize_type(node.get(key)[0])}\n'
     elif node.get(key)[1] != '=':
-        return(f'{REPLACER * (REPLACER_COUNT * node.get(key)[2] - 2)}'
-               f'{node.get(key)[1]} '
-               f'{key}: {normalize_type(node.get(key)[0]).strip()}\n')
+        return f'{REPLACER * (REPLACER_COUNT * indent - 2)}' \
+               f'{node.get(key)[1]} {key}: ' \
+               f'{normalize_type(node.get(key)[0]).strip()}\n'

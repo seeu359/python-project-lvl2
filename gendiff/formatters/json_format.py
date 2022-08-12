@@ -1,6 +1,6 @@
 """
 This formatter display difference between 2 files as:
-{"+a": 1, "b": {"=c: null, "-d": "foo"}}.
+{"+a": 1, "b": {"=c": null, "-d": "foo"}}.
 The output of a command json_loads(output) can be represented as a type(dict).
 """
 
