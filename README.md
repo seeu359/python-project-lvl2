@@ -29,7 +29,9 @@ The utility is able to work with the formats: ```json```, ```yaml```
 1. -**h, --help** - ```gendif -h``` - shows a prompt;
 2. **-f, --format** - ```gendif -f``` - Allows you to select the format of the 
 difference output. **Available formats:**
+  
    1. `-f stylish`- default form. Example output:
+  
    >{  
      common: {  
    >   + follow: false  
@@ -40,11 +42,13 @@ difference output. **Available formats:**
                 key: value  
         }
     2. `-f plain`. Example output:
+  
     > Property 'common.follow' was added with value: false  
 Property 'common.setting2' was removed  
 Property 'common.setting3' was updated. From true to [complex value  
 Property 'common.setting4' was added with value: 'blah blah'
     3. `-f json`. Returns the difference in json format.
+  
         >{"-follow": false, "=host": "hexlet.io", "-proxy": "123.234.53.22", "-timeout": 50, "+timeout": 20, "+verbose": true}
 ---
         
