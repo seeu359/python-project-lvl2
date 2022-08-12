@@ -19,7 +19,7 @@ UPDATED_KEY_VALUE = 'REP+'
 NO_ACTION = 'NoAction'
 
 
-def normalize_type(value):
+def format_reduction(value):
     """
     Returns the value typed for the given formatter
     :param value: type(value) == values of any type
@@ -95,11 +95,11 @@ def formatting_child(node, key, indent):
     if key.startswith(OLD_KEY_VALUE) or key.startswith(UPDATED_KEY_VALUE):
         return f'{REPLACER * (REPLACER_COUNT * indent - 2)}' \
                f'{node.get(key)[1]} {key[4:]}: ' \
-               f'{normalize_type(node.get(key)[0])}\n'
+               f'{format_reduction(node.get(key)[0])}\n'
     elif (node.get(key)[1] == '=') or (node.get(key)[1] == NO_ACTION):
         return f'{REPLACER * REPLACER_COUNT * indent}' \
-               f'{key}: {normalize_type(node.get(key)[0])}\n'
+               f'{key}: {format_reduction(node.get(key)[0])}\n'
     elif node.get(key)[1] != '=':
         return f'{REPLACER * (REPLACER_COUNT * indent - 2)}' \
                f'{node.get(key)[1]} {key}: ' \
-               f'{normalize_type(node.get(key)[0]).strip()}\n'
+               f'{format_reduction(node.get(key)[0]).strip()}\n'
