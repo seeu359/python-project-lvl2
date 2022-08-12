@@ -1,5 +1,4 @@
 # <center><font face = "Monaco" size = 10>Difference generator</font></center>
-
 ---
 
 
