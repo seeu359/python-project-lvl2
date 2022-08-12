@@ -41,7 +41,7 @@ difference output. **Available formats:**
    >   + setting3: {  
                 key: value  
         }
-    2. `-f plain`. Example output:
+    2. `-f plain`. Example output:  
   
     > Property 'common.follow' was added with value: false  
 Property 'common.setting2' was removed  
