@@ -1,9 +1,6 @@
-# <center><font face = "Monaco" size = 10>Difference generator</font></center>
----
+# Difference generator</font></center>
 
-
-
-### <font face = "Monaco" size = 3>Hexlet tests and linter status:
+### Hexlet tests and linter status:
 
 
 
