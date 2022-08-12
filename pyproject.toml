@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "hexlet-code"
 version = "0.1.0"
-description = ""
-authors = ["seeu359 <a.ch3re359@yandex.ru>"]
+description = "Compares two configuration files and shows a difference."
+authors = ["Alexey Cheremushkin <a.ch3re359@yandex.ru>"]
+repository = 'https://github.com/seeu359/python-project-lvl1'
+classifiers = ['?']
 packages = [
   { include = "gendiff" },
 ]
