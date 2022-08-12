@@ -15,10 +15,15 @@ list[2] = The parent of the current node.
     If the node is the root - the value is an empty string
 """
 
-from gendiff import secondary_functions
+from gendiff.lib import secondary_functions
 from gendiff.formatters.stylish import stylish
 from gendiff.formatters.json_format import json
 from gendiff.formatters.plain import plain
+
+
+NOT_CHANGED = '='
+ADDED = '+'
+REMOVED = '-'
 
 formatter_selection = {'stylish': stylish,
                        'json': json,
@@ -33,25 +38,25 @@ def generate_diff(file1, file2, format_name='stylish'):
     Default formatter == stylish.
     :return: type dict
     """
-    file_1 = secondary_functions.open_files(file1)
-    file_2 = secondary_functions.open_files(file2)
+    file1 = secondary_functions.open_files(file1)
+    file2 = secondary_functions.open_files(file2)
     result = dict()
-    keys_list = secondary_functions.sorting_keys(file_1, file_2)
+    keys_list = secondary_functions.sorting_keys(file1, file2)
     parent = ''
     for key in keys_list:
-        if isinstance(file_1.get(key), dict) and \
-                isinstance(file_2.get(key), dict):
+        if isinstance(file1.get(key), dict) and \
+                isinstance(file2.get(key), dict):
             result[key] = [secondary_functions.formatting_parent
-                           (file_1.get(key), file_2.get(key),
-                            parent + key), '=', parent]
-        if isinstance(file_1.get(key), dict) and key not in file_2:
+                           (file1.get(key), file2.get(key),
+                            parent + key), NOT_CHANGED, parent]
+        if isinstance(file1.get(key), dict) and key not in file2:
             result[key] = [secondary_functions.processing_without_format
-                           (file_1.get(key), f'{parent}{key}'), '-', parent]
-        if key not in file_1 and isinstance(file_2.get(key), dict):
+                           (file1.get(key), f'{parent}{key}'), REMOVED, parent]
+        if key not in file1 and isinstance(file2.get(key), dict):
             result[key] = [secondary_functions.processing_without_format
-                           (file_2.get(key), f'{parent}{key}'), '+', parent]
+                           (file2.get(key), f'{parent}{key}'), ADDED, parent]
         else:
-            value = secondary_functions.formatting_parent(file_1,
-                                                          file_2, parent)
+            value = secondary_functions.formatting_parent(file1,
+                                                          file2, parent)
             result.update(value)
     return formatter_selection[format_name](result)

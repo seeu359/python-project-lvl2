@@ -1,17 +1,19 @@
 import json
 import yaml
 
-
-OLD_KEY_VALUES = 'REP-'
-UPDATED_KEY_VALUES = 'REP+'
+NOT_CHANGED = '='
+ADDED = '+'
+REMOVED = '-'
+OLD_KEY_VALUES = ('REP-', '-')
+UPDATED_KEY_VALUES = ('REP+', '+')
 NOT_FORMAT = 'NoAction'
 
 
 def define_node(node1, node2, key):
     if node1.get(key) is not None:
-        return [node1, '-']
+        return [node1, REMOVED]
     elif node2.get(key) is not None:
-        return [node2, '+']
+        return [node2, ADDED]
 
 
 def open_files(path):
@@ -48,7 +50,8 @@ def formatting_parent(node1, node2, parent):
                     isinstance(node2.get(key), dict):
                 result[key] = [formatting_parent(node1.get(key),
                                                  node2.get(key),
-                                                 f'{parent}.{key}'), '=',
+                                                 f'{parent}.{key}'),
+                               NOT_CHANGED,
                                parent]
             else:
                 value = complex_formatting(node1, node2, key, parent)
@@ -63,11 +66,14 @@ def formatting_parent(node1, node2, parent):
 def formatting_child(parent1, parent2, key, parent):
     result = dict()
     if parent1[key] == parent2[key]:
-        result[key] = [parent1.get(key), '=', parent]
+        result[key] = [parent1.get(key), NOT_CHANGED, parent]
         return result
     elif parent1[key] != parent2[key]:
-        result[f'{OLD_KEY_VALUES}{key}'] = [parent1.get(key), '-', parent]
-        result[f'{UPDATED_KEY_VALUES}{key}'] = [parent2.get(key), '+', parent]
+        result[f'{OLD_KEY_VALUES[0]}{key}'] = [parent1.get(key),
+                                               OLD_KEY_VALUES[1], parent]
+        result[f'{UPDATED_KEY_VALUES[0]}{key}'] = [parent2.get(key),
+                                                   UPDATED_KEY_VALUES[1],
+                                                   parent]
         return result
 
 
@@ -75,19 +81,23 @@ def complex_formatting(parent1, parent2, key, parent):
     result = dict()
     if isinstance(parent1.get(key), dict) and not \
             isinstance(parent2.get(key), dict):
-        result[f'{OLD_KEY_VALUES}{key}'] = [processing_without_format
-                                            (parent1.get(key),
-                                             f'{parent}.{key}'),
-                                            '-', parent]
-        result[f'{UPDATED_KEY_VALUES}{key}'] = [parent2.get(key), '+', parent]
+        result[f'{OLD_KEY_VALUES[0]}{key}'] = [processing_without_format
+                                               (parent1.get(key),
+                                                f'{parent}.{key}'),
+                                               OLD_KEY_VALUES[1], parent]
+        result[f'{UPDATED_KEY_VALUES[0]}{key}'] = [parent2.get(key),
+                                                   UPDATED_KEY_VALUES[1],
+                                                   parent]
         return result
     elif not isinstance(parent1.get(key), dict) and \
             isinstance(parent2.get(key), dict):
-        result[f'{OLD_KEY_VALUES}{key}'] = [parent1.get(key), '-', parent]
-        result[f'{UPDATED_KEY_VALUES}{key}'] = [processing_without_format
-                                                (parent2.get(key),
-                                                 f'{parent}.{key}'), '+',
-                                                parent]
+        result[f'{OLD_KEY_VALUES[0]}{key}'] = [parent1.get(key),
+                                               OLD_KEY_VALUES[1], parent]
+        result[f'{UPDATED_KEY_VALUES[0]}{key}'] = [processing_without_format
+                                                   (parent2.get(key),
+                                                    f'{parent}.{key}'),
+                                                   UPDATED_KEY_VALUES[1],
+                                                   parent]
         return result
 
 
