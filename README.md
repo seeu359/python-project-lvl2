@@ -36,10 +36,10 @@ difference output. **Available formats:**
      common: {  
  +  follow: false  
      setting1: Value 1  
- -  setting2: 200  
- -  setting3: true  
- +  setting3: {   
-       key: value  
+  -  setting2: 200  
+  -  setting3: true  
+  +  setting3: {   
+        key: value  
      }  
 }
     2. `-f plain`. Example output:  
