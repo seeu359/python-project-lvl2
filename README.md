@@ -50,7 +50,7 @@ Property 'common.setting3' was updated. From true to [complex value
 Property 'common.setting4' was added with value: 'blah blah'
     3. `-f json`. Returns the difference in json format.
   
-        >{"-follow": false, "=host": "hexlet.io", "-proxy": "123.234.53.22", "-timeout": 50, "+timeout": 20, "+verbose": true}
+    >{"-follow": false, "=host": "hexlet.io", "-proxy": "123.234.53.22", "-timeout": 50, "+timeout": 20, "+verbose": true}
 ---
         
 
