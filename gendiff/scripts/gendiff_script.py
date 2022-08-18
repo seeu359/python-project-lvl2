@@ -1,18 +1,11 @@
 #!/usr/bin/env python
 from gendiff.generate_diff import generate_diff
-from gendiff.lib.parser import parsers_data
+from gendiff.lib.parser import create_args
 
 
 def main():
-    args = parsers_data()
-    if args.format == 'json':
-        print(generate_diff(args.first_file, args.second_file,
-                            'json'))
-    elif args.format == 'plain':
-        print(generate_diff(args.first_file, args.second_file,
-                            'plain'))
-    elif args.format == 'stylish':
-        print(generate_diff(args.first_file, args.second_file))
+    args = create_args()
+    print(generate_diff(args.first_file, args.second_file, args.format))
 
 
 if __name__ == '__main__':

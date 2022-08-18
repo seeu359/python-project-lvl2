@@ -1,7 +1,7 @@
 import argparse
 
 
-def parsers_data():
+def create_args():
     parser = argparse.ArgumentParser(description='Compares two configuration'
                                                  ' files and shows '
                                                  'a difference.')
@@ -9,5 +9,5 @@ def parsers_data():
     parser.add_argument('second_file')
     parser.add_argument('-f', '--format',
                         help='set format of output',
-                        default='stylish')
+                        default='stylish', choices=['stylish', 'plain', 'json'])
     return parser.parse_args()
