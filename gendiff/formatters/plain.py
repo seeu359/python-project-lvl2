@@ -39,19 +39,19 @@ def plain(represent):
     :param represent: type(represent) == dict
     :return: type str.
     """
-    def distributing_keys(data, result, path):
+    def alocate_keys(data, result, path):
         for key in data:
             if isinstance(data.get(key)[0], dict) and data.get(key)[1] == '=':
-                distributing_keys(data.get(key)[0], result, path + f'{key}.')
+                alocate_keys(data.get(key)[0], result, path + f'{key}.')
             elif isinstance(data.get(key)[0], dict) and data.get(key)[1] != '=':
-                result.append(formatting_parent(data, key, path))
+                result.append(format_parent(data, key, path))
             if not isinstance(data.get(key)[0], dict):
-                result.append(formatting_child(data, key, path))
+                result.append(format_child(data, key, path))
         return ''.join(result).strip()
-    return distributing_keys(represent, [], '')
+    return alocate_keys(represent, [], '')
 
 
-def formatting_parent(data, key, path):
+def format_parent(data, key, path):
     """
     Takes control if the parent node has children with changed values.
     Returns a formatted value
@@ -70,7 +70,7 @@ def formatting_parent(data, key, path):
         return f"Property '{path}{key}' {ADDED} {COMPLEX}\n"
 
 
-def formatting_child(data, key, path):
+def format_child(data, key, path):
     """
     Takes control if the previous value is not a parent node. Returns a string
     representation of the changed key with the path from the parent node.

@@ -37,20 +37,20 @@ def json(represent):
     :param represent: type(represent) == dict
     :return: type str
     """
-    def distributing_keys(node, result):
+    def alocate_keys(node, result):
         for key in node:
             if isinstance(node.get(key)[0], dict):
-                result.append(formatting_parent(node, key))
-                distributing_keys(node.get(key)[0], result)
+                result.append(format_parent(node, key))
+                alocate_keys(node.get(key)[0], result)
             elif not isinstance(node.get(key)[0], dict):
-                result.append(formatting_child(node, key))
+                result.append(format_child(node, key))
         result[-1] = result[-1][:-2]
         result.append('}, ')
         return ''.join(result).strip()[:-1]
-    return distributing_keys(represent, ['{'])
+    return alocate_keys(represent, ['{'])
 
 
-def formatting_parent(node, key):
+def format_parent(node, key):
     """
     Takes control from the parent. Depending on the different values in 2 files,
     takes the final value. Different displays in first symbol keys.
@@ -75,7 +75,7 @@ def formatting_parent(node, key):
         return options[node.get(key)[1]]
 
 
-def formatting_child(node, key):
+def format_child(node, key):
     """
     Takes control if the previous key is not the parent node. Adds to the final
     result a key with one of the first characters ('-', '+', '+') and the

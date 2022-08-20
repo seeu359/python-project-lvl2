@@ -43,19 +43,19 @@ def stylish(represent):
     :param represent: type(represent) == dict
     :return: type str
     """
-    def distributing_keys(node, result, indent):
+    def alocate_keys(node, result, indent):
         for key in node:
             if isinstance(node.get(key)[0], dict):
-                result.append(formatting_parent(node, key, indent))
-                distributing_keys(node.get(key)[0], result, indent + 1)
+                result.append(format_parent(node, key, indent))
+                alocate_keys(node.get(key)[0], result, indent + 1)
             if not isinstance(node.get(key)[0], dict):
-                result.append(formatting_child(node, key, indent))
+                result.append(format_child(node, key, indent))
         result.append(REPLACER * REPLACER_COUNT * (indent - 1) + '}\n')
         return ''.join(result).strip()
-    return distributing_keys(represent, ['{\n'], 1)
+    return alocate_keys(represent, ['{\n'], 1)
 
 
-def formatting_parent(node, key, indent):
+def format_parent(node, key, indent):
     """
     Takes control from the parent. The difference is displayed as one of the
     characters before the key.The '+' sign indicates that the node was added
@@ -78,7 +78,7 @@ def formatting_parent(node, key, indent):
                 f'{node.get(key)[1]} {key}: {{\n')
 
 
-def formatting_child(node, key, indent):
+def format_child(node, key, indent):
     """
     Takes control if key value is not a dictionary. Returns a key preceded by a
     key character that indicates changes made to the given key.
