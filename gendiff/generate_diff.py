@@ -26,7 +26,7 @@ formatter_selection = {'stylish': stylish,
                        'plain': plain}
 
 
-def generate_diff(file1, file2, format_name='stylish'):  # noqa: C901
+def generate_diff(file1, file2, format_name='stylish'):
     """
     :param file1: type(file1) == str. Path to file1
     :param file2: type(file2) == str. Path to file2
@@ -39,30 +39,7 @@ def generate_diff(file1, file2, format_name='stylish'):  # noqa: C901
     result = []
     keys_list = dh.get_sorted_keys(file1_data, file2_data)
     for root in keys_list:
-        if root not in file2_data:
-            if isinstance(file1_data[root], dict):
-                result.append({'key': root,
-                              'type': 'parent',
-                               'state': dh.STATE_REMOTE,
-                               'children': file1_data.get(root)
-                               })
-            else:
-                result.append(nh.flat_structure_proccess(root,
-                                                         file1_data=file1_data,
-                                                         file2_data=None))
-        elif root not in file1_data:
-            if isinstance(file2_data[root], dict):
-                result.append({'key': root,
-                              'type': 'parent',
-                               'state': dh.STATE_ADDED,
-                               'children': file2_data.get(root)
-                               })
-            else:
-                result.append(
-                    nh.flat_structure_proccess
-                    (root, file1_data=None,
-                     file2_data=file2_data))
-        else:
+        if root in file1_data and root in file2_data:
             if isinstance(file1_data[root], dict) and \
                     isinstance(file2_data[root], dict):
                 result.append({'key': root,
@@ -71,8 +48,19 @@ def generate_diff(file1, file2, format_name='stylish'):  # noqa: C901
                                'children': nh.format_child(file1_data.get(root),
                                                            file2_data.get(root))
                                })
+                continue
             else:
                 result.append(
-                    nh.flat_structure_proccess(root, file1_data,
-                                               file2_data))
+                    nh.compare_values(file1_data, file2_data, root))
+                continue
+        if root in file1_data or root in file2_data:
+            node = dh.get_find_node(file1_data, file2_data, root)
+            if isinstance(node[0].get(root), dict):
+                result.append({'key': root,
+                              'type': 'parent',
+                               'state': node[1],
+                               'children': node[0].get(root)
+                               })
+            else:
+                result.append(nh.flat_structure_proccess(root, node))
     return formatter_selection[format_name](result)

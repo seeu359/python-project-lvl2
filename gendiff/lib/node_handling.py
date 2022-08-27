@@ -1,7 +1,7 @@
 from gendiff.lib import data_handling as dh
 
 
-def format_child(node1, node2):  # noqa: C901
+def format_child(node1, node2):
     result = []
     child_list = dh.get_sorted_keys(node1, node2)
     for child in child_list:
@@ -44,18 +44,9 @@ def compare_values(node1, node2, child):
                 }
 
 
-def flat_structure_proccess(node, file1_data=None, file2_data=None):
-    if file2_data is None:
-        return {'key': node,
-                'type': 'children',
-                'state': dh.STATE_REMOTE,
-                'value': file1_data[node],
-                }
-    elif file1_data is None:
-        return {'key': node,
-                'type': 'children',
-                'state': dh.STATE_ADDED,
-                'value': file2_data[node],
-                }
-    else:
-        return compare_values(file1_data, file2_data, node)
+def flat_structure_proccess(root, node):
+    return {'key': root,
+            'type': 'children',
+            'state': node[1],
+            'value': node[0].get(root),
+            }
