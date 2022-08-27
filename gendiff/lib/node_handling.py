@@ -1,93 +1,76 @@
-from gendiff.lib import data_handling
-
-NOT_CHANGED = '='
-OLD_KEY_VALUES = ('REP-', '-')
-UPDATED_KEY_VALUES = ('REP+', '+')
-NOT_FORMAT = 'NoAction'
+from gendiff.lib import data_handling as dh
 
 
-def format_parent(node1, node2, parent):
-    result = dict()
-    keys_list = data_handling.get_sorted_keys(node1, node2)
-    for key in keys_list:
-        if key in node1 and key in node2:
-            if not isinstance(node1.get(key), dict) and not \
-                    isinstance(node2.get(key), dict):
-                value = format_child(node1, node2, key, parent)
-                result.update(value)
-            elif isinstance(node1.get(key), dict) and \
-                    isinstance(node2.get(key), dict):
-                result[key] = [format_parent(node1.get(key),
-                                             node2.get(key),
-                                             f'{parent}.{key}'),
-                               NOT_CHANGED,
-                               parent]
+def format_child(node1, node2):  # noqa: C901
+    result = []
+    child_list = dh.get_sorted_keys(node1, node2)
+    for child in child_list:
+        if child in node1 and child in node2:
+            if isinstance(node1.get(child), dict) and \
+                    isinstance(node2.get(child), dict):
+                result.append({'key': child,
+                               'type': 'parent',
+                               'state': dh.STATE_NO_CHANGE,
+                               'children': format_child(node1.get(child),
+                                                        node2.get(child))
+                               })
             else:
-                value = comprehensive_format(node1, node2, key, parent)
-                result.update(value)
-        else:
-            result[key] = single_node_process(data_handling.define_node
-                                              (node1, node2, key),
-                                              parent, key)
+                result.append(compare_values(node1, node2, child))
+        elif child not in node2:
+            if isinstance(node1.get(child), dict):
+                node_type = 'parent'
+                value = 'children'
+            else:
+                node_type = 'children'
+                value = 'value'
+            result.append({'key': child,
+                           'type': node_type,
+                           'state': dh.STATE_REMOTE,
+                           value: node1.get(child),
+                           })
+        elif child not in node1:
+            if isinstance(node2.get(child), dict):
+                node_type = 'parent'
+                value = 'children'
+            else:
+                node_type = 'children'
+                value = 'value'
+            result.append({'key': child,
+                           'type': node_type,
+                           'state': dh.STATE_ADDED,
+                           value: node2.get(child),
+                           })
     return result
 
 
-def format_child(parent1, parent2, key, parent):
-    result = dict()
-    if parent1[key] == parent2[key]:
-        result[key] = [parent1.get(key), NOT_CHANGED, parent]
-        return result
-    elif parent1[key] != parent2[key]:
-        result[f'{OLD_KEY_VALUES[0]}{key}'] = [parent1.get(key),
-                                               OLD_KEY_VALUES[1], parent]
-        result[f'{UPDATED_KEY_VALUES[0]}{key}'] = [parent2.get(key),
-                                                   UPDATED_KEY_VALUES[1],
-                                                   parent]
-        return result
+def compare_values(node1, node2, child):
+    if node1.get(child) == node2.get(child):
+        return {'key': child,
+                'type': 'children',
+                'state': dh.STATE_NO_CHANGE,
+                'value': node1.get(child),
+                }
+    else:
+        return {'key': child,
+                'type': 'children',
+                'state': dh.STATE_CHANGE,
+                'old_value': node1.get(child),
+                'new_value': node2.get(child),
+                }
 
 
-def comprehensive_format(parent1, parent2, key, parent):
-    result = dict()
-    if isinstance(parent1.get(key), dict) and not \
-            isinstance(parent2.get(key), dict):
-        result[f'{OLD_KEY_VALUES[0]}{key}'] = [process_without_format
-                                               (parent1.get(key),
-                                                f'{parent}.{key}'),
-                                               OLD_KEY_VALUES[1], parent]
-        result[f'{UPDATED_KEY_VALUES[0]}{key}'] = [parent2.get(key),
-                                                   UPDATED_KEY_VALUES[1],
-                                                   parent]
-        return result
-    elif not isinstance(parent1.get(key), dict) and \
-            isinstance(parent2.get(key), dict):
-        result[f'{OLD_KEY_VALUES[0]}{key}'] = [parent1.get(key),
-                                               OLD_KEY_VALUES[1], parent]
-        result[f'{UPDATED_KEY_VALUES[0]}{key}'] = [process_without_format
-                                                   (parent2.get(key),
-                                                    f'{parent}.{key}'),
-                                                   UPDATED_KEY_VALUES[1],
-                                                   parent]
-        return result
-
-
-def process_without_format(node, parent):
-    result = dict()
-    keys_list = data_handling.get_sorted_keys(node)
-    for key in keys_list:
-        if not isinstance(node.get(key), dict):
-            result[key] = ([node.get(key), NOT_FORMAT, parent])
-        elif isinstance(node.get(key), dict):
-            result[key] = [process_without_format(node.get(key),
-                                                  f'{parent}.{key}'),
-                           NOT_FORMAT, parent]
-    return result
-
-
-def single_node_process(node, parent, key):
-    if not isinstance(node[0].get(key), dict):
-        return [node[0].get(key), node[1], parent]
-    elif isinstance(node[0].get(key), dict):
-        result = [process_without_format(node[0].get(key),
-                                         f'{parent}.{key}'), node[1],
-                  parent]
-        return result
+def flat_structure_proccess(node, file1_data=None, file2_data=None):
+    if file2_data is None:
+        return {'key': node,
+                'type': 'children',
+                'state': dh.STATE_REMOTE,
+                'value': file1_data[node],
+                }
+    elif file1_data is None:
+        return {'key': node,
+                'type': 'children',
+                'state': dh.STATE_ADDED,
+                'value': file2_data[node],
+                }
+    else:
+        return compare_values(file1_data, file2_data, node)

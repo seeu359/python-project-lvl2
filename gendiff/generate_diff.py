@@ -1,5 +1,5 @@
 """
-The module compares 2 files () and returns a dictionary with an internal
+The module compares 2 files and returns a dictionary with an internal
 representation of each key. The value of each key is a list of the form:
 list[0] = the actual value of the key
 list[1] = modification type
@@ -15,22 +15,18 @@ list[2] = The parent of the current node.
     If the node is the root - the value is an empty string
 """
 
-from gendiff.lib import data_handling, node_handling
+from gendiff.lib import data_handling as dh, node_handling as nh
 from gendiff.formatters.stylish import stylish
-from gendiff.formatters.json import json
+from gendiff.formatters.json import json_output as json
 from gendiff.formatters.plain import plain
 
-
-NOT_CHANGED = '='
-ADDED = '+'
-REMOVED = '-'
 
 formatter_selection = {'stylish': stylish,
                        'json': json,
                        'plain': plain}
 
 
-def generate_diff(file1, file2, format_name='stylish'):
+def generate_diff(file1, file2, format_name='stylish'):  # noqa: C901
     """
     :param file1: type(file1) == str. Path to file1
     :param file2: type(file2) == str. Path to file2
@@ -38,25 +34,45 @@ def generate_diff(file1, file2, format_name='stylish'):
     Default formatter == stylish.
     :return: type dict
     """
-    file1 = data_handling.get_file_data(file1)
-    file2 = data_handling.get_file_data(file2)
-    result = dict()
-    keys_list = data_handling.get_sorted_keys(file1, file2)
-    parent = ''
-    for key in keys_list:
-        if isinstance(file1.get(key), dict) and \
-                isinstance(file2.get(key), dict):
-            result[key] = [node_handling.format_parent
-                           (file1.get(key), file2.get(key),
-                            parent + key), NOT_CHANGED, parent]
-        if isinstance(file1.get(key), dict) and key not in file2:
-            result[key] = [node_handling.process_without_format
-                           (file1.get(key), f'{parent}{key}'), REMOVED, parent]
-        if key not in file1 and isinstance(file2.get(key), dict):
-            result[key] = [node_handling.process_without_format
-                           (file2.get(key), f'{parent}{key}'), ADDED, parent]
+    file1_data = dh.get_file_data(file1)
+    file2_data = dh.get_file_data(file2)
+    result = []
+    keys_list = dh.get_sorted_keys(file1_data, file2_data)
+    for root in keys_list:
+        if root not in file2_data:
+            if isinstance(file1_data[root], dict):
+                result.append({'key': root,
+                              'type': 'parent',
+                               'state': dh.STATE_REMOTE,
+                               'children': file1_data.get(root)
+                               })
+            else:
+                result.append(nh.flat_structure_proccess(root,
+                                                         file1_data=file1_data,
+                                                         file2_data=None))
+        elif root not in file1_data:
+            if isinstance(file2_data[root], dict):
+                result.append({'key': root,
+                              'type': 'parent',
+                               'state': dh.STATE_ADDED,
+                               'children': file2_data.get(root)
+                               })
+            else:
+                result.append(
+                    nh.flat_structure_proccess
+                    (root, file1_data=None,
+                     file2_data=file2_data))
         else:
-            value = node_handling.format_parent(file1,
-                                                file2, parent)
-            result.update(value)
+            if isinstance(file1_data[root], dict) and \
+                    isinstance(file2_data[root], dict):
+                result.append({'key': root,
+                              'type': 'parent',
+                               'state': dh.STATE_NO_CHANGE,
+                               'children': nh.format_child(file1_data.get(root),
+                                                           file2_data.get(root))
+                               })
+            else:
+                result.append(
+                    nh.flat_structure_proccess(root, file1_data,
+                                               file2_data))
     return formatter_selection[format_name](result)

@@ -12,50 +12,36 @@ This formatter display difference between 2 files as:
         }
 }
 """
-REPLACER = ' '
-REPLACER_COUNT = 4
-OLD_KEY_VALUE = 'REP-'
-UPDATED_KEY_VALUE = 'REP+'
-NO_ACTION = 'NoAction'
+from gendiff.lib import data_handling as dh
+
+INDENT_STEP = 4
 
 
-def format_reduction(value):
-    """
-    Returns the value typed for the given formatter
-    :param value: type(value) == values of any type
-    :return: if type(value) is bool return str(value).lower()
-    if type(value) is None return 'null'
-    else return str(value)
-    """
-    if type(value) is bool:
-        return str(value).lower()
-    elif value is None:
-        return 'null'
-    else:
-        return str(value)
-
-
-def stylish(represent):
+def stylish(introduction):
     """
     A recursive function that distributes keys among formatter functions, or,
     if the key value type is a dictionary, takes the recursive case and passes
     the stored path into itself
-    :param represent: type(represent) == dict
+    :param introduction: type(represent) == dict
     :return: type str
-    """
-    def alocate_keys(node, result, indent):
-        for key in node:
-            if isinstance(node.get(key)[0], dict):
-                result.append(format_parent(node, key, indent))
-                alocate_keys(node.get(key)[0], result, indent + 1)
-            if not isinstance(node.get(key)[0], dict):
-                result.append(format_child(node, key, indent))
-        result.append(REPLACER * REPLACER_COUNT * (indent - 1) + '}\n')
+            """
+    def format_root(node, result, indent):
+
+        for data in node:
+            if data['type'] == 'parent' and data['state'] != dh.STATE_NO_CHANGE:
+                result.append(format_parent(data, indent))
+            if data['type'] == 'parent' and data['state'] == dh.STATE_NO_CHANGE:
+                result.append(format_parent(data, indent))
+                format_root(data.get('children'), result, indent + 4)
+            elif data['type'] == 'children':
+                result.append(format_child(data, indent))
+        result.append(' ' * (indent - 4) + '}\n')
         return ''.join(result).strip()
-    return alocate_keys(represent, ['{\n'], 1)
+
+    return format_root(introduction, ['{\n'], 4)
 
 
-def format_parent(node, key, indent):
+def format_parent(node, indent):
     """
     Takes control from the parent. The difference is displayed as one of the
     characters before the key.The '+' sign indicates that the node was added
@@ -63,22 +49,25 @@ def format_parent(node, key, indent):
     The absence of a sign in front of the parent means that its internal
     structure has changed
     :param node: type(node) == dict
-    :param key: type(key) == str
     :param indent: type(indent) == int
     :return: type str
     """
-    if node.get(key)[1] == '=' or node.get(key)[1] == NO_ACTION:
-        return (f'{REPLACER * REPLACER_COUNT * indent}'
-                f'{key}: {{\n')
-    elif key.startswith(OLD_KEY_VALUE) or key.startswith(UPDATED_KEY_VALUE):
-        return (f'{REPLACER * (REPLACER_COUNT * indent - 2)}'
-                f'{node.get(key)[1]} {key[4:]}: {{\n')
+    if node['state'] == dh.STATE_NO_CHANGE:
+        return f"{' ' * indent}{node['key']}: {{\n"
     else:
-        return (f'{REPLACER * (REPLACER_COUNT * indent - 2)}'
-                f'{node.get(key)[1]} {key}: {{\n')
+        margin = f"{' ' * (indent - dh.MARK[node['state']][1])}"
+        return f"{margin}{dh.MARK[node['state']][0]}{node['key']}: {{" \
+               f"{selector(node['children'], indent)}\n"
 
 
-def format_child(node, key, indent):
+def selector(node, indent):
+    if isinstance(node, dict):
+        return nested_format(node, indent + INDENT_STEP)
+    else:
+        return dh.format_reduction(node, 'stylish')
+
+
+def format_child(node, indent):
     """
     Takes control if key value is not a dictionary. Returns a key preceded by a
     key character that indicates changes made to the given key.
@@ -88,18 +77,36 @@ def format_child(node, key, indent):
     If the names of two neighboring keys are the same, key values was changed in
     second file.
     :param node: type(node) == dict
-    :param key: type(key) == str
     :param indent: type(indent) == int
     :return: type str
     """
-    if key.startswith(OLD_KEY_VALUE) or key.startswith(UPDATED_KEY_VALUE):
-        return f'{REPLACER * (REPLACER_COUNT * indent - 2)}' \
-               f'{node.get(key)[1]} {key[4:]}: ' \
-               f'{format_reduction(node.get(key)[0])}\n'
-    elif (node.get(key)[1] == '=') or (node.get(key)[1] == NO_ACTION):
-        return f'{REPLACER * REPLACER_COUNT * indent}' \
-               f'{key}: {format_reduction(node.get(key)[0])}\n'
-    elif node.get(key)[1] != '=':
-        return f'{REPLACER * (REPLACER_COUNT * indent - 2)}' \
-               f'{node.get(key)[1]} {key}: ' \
-               f'{format_reduction(node.get(key)[0]).strip()}\n'
+    result = ''
+    if node['state'] == dh.STATE_CHANGE:
+        bracket = '{' if isinstance(node['old_value'], dict) else ''
+        result += f"{' ' * (indent - 2)}- {node['key']}: {bracket}" \
+                  f"{selector(node['old_value'], indent)}\n"
+        bracket = '{' if isinstance(node['new_value'], dict) else ''
+        result += f"{' ' * (indent - 2)}+ {node['key']}: {bracket}" \
+                  f"{(selector(node['new_value'], indent))}\n"
+    else:
+        margin = ' ' * (indent - dh.MARK[node['state']][1])
+        mark = dh.MARK[node['state']][0]
+        result += f"{margin}{mark}{node['key']}: " \
+                  f"{(dh.format_reduction(node['value'], 'stylish'))}\n"
+    return result
+
+
+def nested_format(node, indents):
+
+    def node_processing(data, indent, result):
+        for key in data:
+            if isinstance(data[key], dict):
+                result.append(f"\n{' ' * indent}{key}: {{")
+                node_processing(data[key], indent + INDENT_STEP, result)
+            else:
+                result.append(f"\n{' ' * indent}{key}: "
+                              f"{dh.format_reduction(data[key], 'stylish')}")
+        result.append('\n' + ' ' * (indent - INDENT_STEP) + '}')
+        return ''.join(result).rstrip()
+
+    return node_processing(node, indents, [])
