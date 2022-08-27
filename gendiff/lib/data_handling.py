@@ -23,18 +23,19 @@ def format_reduction(value, formatter):
     Any time return 'str(value)'
     """
     if isinstance(value, bool):
-        return f'{str(value).lower()}'
+        value = f'{str(value).lower()}'
     elif isinstance(value, int):
-        return str(value)
+        value = str(value)
     elif value is None:
-        return 'null'
+        value = 'null'
     else:
         if formatter == 'stylish':
-            return f"{str(value)}"
+            value = f"{str(value)}"
         else:
             if isinstance(value, dict):
                 return '[complex value]'
             return f"'{str(value)}'"
+    return value
 
 
 def get_file_data(path):

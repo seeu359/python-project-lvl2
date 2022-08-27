@@ -44,7 +44,7 @@ def compare_values(node1, node2, child):
                 }
 
 
-def flat_structure_proccess(root, node):
+def flat_structure_process(root, node):
     return {'key': root,
             'type': 'children',
             'state': node[1],

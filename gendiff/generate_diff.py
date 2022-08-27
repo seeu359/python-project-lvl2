@@ -62,5 +62,5 @@ def generate_diff(file1, file2, format_name='stylish'):
                                'children': node[0].get(root)
                                })
             else:
-                result.append(nh.flat_structure_proccess(root, node))
+                result.append(nh.flat_structure_process(root, node))
     return formatter_selection[format_name](result)
