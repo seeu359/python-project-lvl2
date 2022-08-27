@@ -57,3 +57,10 @@ def get_sorted_keys(*parents):
         index += 1
     result.sort()
     return result
+
+
+def get_find_node(node1, node2, child):
+    if child in node1:
+        return node1, STATE_REMOTE
+    else:
+        return node2, STATE_ADDED

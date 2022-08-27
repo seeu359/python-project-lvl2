@@ -16,29 +16,14 @@ def format_child(node1, node2):  # noqa: C901
                                })
             else:
                 result.append(compare_values(node1, node2, child))
-        elif child not in node2:
-            if isinstance(node1.get(child), dict):
-                node_type = 'parent'
-                value = 'children'
-            else:
-                node_type = 'children'
-                value = 'value'
+        elif child in node1 or child in node2:
+            node = dh.get_find_node(node1, node2, child)
+            node_type, value = ('parent', 'children') if \
+                isinstance(node[0][child], dict) else ('children', 'value')
             result.append({'key': child,
                            'type': node_type,
-                           'state': dh.STATE_REMOTE,
-                           value: node1.get(child),
-                           })
-        elif child not in node1:
-            if isinstance(node2.get(child), dict):
-                node_type = 'parent'
-                value = 'children'
-            else:
-                node_type = 'children'
-                value = 'value'
-            result.append({'key': child,
-                           'type': node_type,
-                           'state': dh.STATE_ADDED,
-                           value: node2.get(child),
+                           'state': node[1],
+                           value: node[0].get(child),
                            })
     return result
 
