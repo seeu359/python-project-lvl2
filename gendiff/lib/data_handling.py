@@ -49,13 +49,10 @@ def get_file_data(path):
 
 def get_sorted_keys(*parents):
     result = []
-    index = 0
-    array = [*parents]
-    while index < len(array):
-        for key in array[index]:
-            if key not in result:
-                result.append(key)
-        index += 1
+    array = (x for key in parents for x in key)
+    for key in array:
+        if key not in result:
+            result.append(key)
     result.sort()
     return result
 
