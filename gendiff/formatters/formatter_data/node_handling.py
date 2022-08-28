@@ -5,23 +5,19 @@ def format_child(node1, node2):
     result = []
     child_list = dh.get_sorted_keys(node1, node2)
     for child in child_list:
-        if (child in node1 and child in node2) and \
-                (isinstance(node1[child], dict) and isinstance(node2[child],
-                                                               dict)):
-            result.append({'key': child,
-                           'type': 'parent',
-                           'state': dh.STATE_NO_CHANGE,
-                           'children': format_child(node1.get(child),
-                                                    node2.get(child))
-                           })
-            continue
-        elif (child in node1 and child in node2) and \
-                (not isinstance(node1[child], dict) and not
-                 isinstance(node2[child], dict)):
-            result.append(compare_values(node1, node2, child))
-            continue
-        elif child in node1 and child in node2:
-            result.append(compare_values(node1, node2, child))
+        if child in node1 and child in node2:
+            if isinstance(node1[child], dict) and isinstance(node2[child],
+                                                             dict):
+                result.append({'key': child,
+                               'type': 'parent',
+                               'state': dh.STATE_NO_CHANGE,
+                               'children': format_child(node1.get(child),
+                                                        node2.get(child))
+                               })
+                continue
+            else:
+                result.append(compare_values(node1, node2, child))
+                continue
         elif child in node1 or child in node2:
             node = dh.get_find_node(node1, node2, child)
             node_type, value = ('parent', 'children') if \
