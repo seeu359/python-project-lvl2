@@ -1,7 +1,7 @@
 import argparse
 
 
-def create_args():
+def get_parser_args():
     parser = argparse.ArgumentParser(description='Compares two configuration'
                                                  ' files and shows '
                                                  'a difference. ')
