@@ -2,6 +2,11 @@ from gendiff.formatters.formatter_data import data_handling as dh
 
 
 def format_child(node1, node2):
+    """
+    :param node1: type(node1) == dict
+    :param node2: type(node2) == dict.
+    :return:
+    """
     result = []
     child_list = dh.get_sorted_keys(node1, node2)
     for child in child_list:

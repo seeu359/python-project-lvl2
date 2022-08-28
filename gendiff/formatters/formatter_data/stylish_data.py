@@ -3,8 +3,18 @@ from gendiff.formatters.formatter_data import data_handling as dh
 INDENT_STEP = 4
 
 
-def format_root(node, result, indent):
-    for data in node:
+def format_root(introduction, result, indent):
+    """
+    The function, depending on the type of node, passes control to the handler
+    functions
+    :param introduction: type(introduction) == dict. Takes an internal
+    representation from the
+    diff
+    :param result: type(result) == list. Intermediate result.
+    :param indent: type(indent) == dict. Default indent == 4
+    :return: type(str)
+    """
+    for data in introduction:
         if data['type'] == 'parent' and data['state'] != dh.STATE_NO_CHANGE:
             result.append(format_parent(data, indent))
         if data['type'] == 'parent' and data['state'] == dh.STATE_NO_CHANGE:
@@ -32,10 +42,10 @@ def format_parent(node, indent):
     else:
         margin = f"{' ' * (indent - dh.MARK[node['state']][1])}"
         return f"{margin}{dh.MARK[node['state']][0]}{node['key']}: {{" \
-               f"{selector(node['children'], indent)}\n"
+               f"{alocate_value(node['children'], indent)}\n"
 
 
-def selector(node, indent):
+def alocate_value(node, indent):
     if isinstance(node, dict):
         return nested_format(node, indent + INDENT_STEP)
     else:
@@ -59,10 +69,10 @@ def format_child(node, indent):
     if node['state'] == dh.STATE_CHANGE:
         bracket = '{' if isinstance(node['old_value'], dict) else ''
         result += f"{' ' * (indent - 2)}- {node['key']}: {bracket}" \
-                  f"{selector(node['old_value'], indent)}\n"
+                  f"{alocate_value(node['old_value'], indent)}\n"
         bracket = '{' if isinstance(node['new_value'], dict) else ''
         result += f"{' ' * (indent - 2)}+ {node['key']}: {bracket}" \
-                  f"{(selector(node['new_value'], indent))}\n"
+                  f"{(alocate_value(node['new_value'], indent))}\n"
     else:
         margin = ' ' * (indent - dh.MARK[node['state']][1])
         mark = dh.MARK[node['state']][0]
@@ -72,7 +82,13 @@ def format_child(node, indent):
 
 
 def nested_format(node, indents):
-
+    """
+    Function that comprehensively handles a remote or added parent node with
+    all children
+    :param node: type(node) == dict.
+    :param indents: type(indents) == int.
+    :return: type str.
+    """
     def node_processing(data, indent, result):
         for key in data:
             if isinstance(data[key], dict):

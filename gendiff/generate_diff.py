@@ -1,18 +1,11 @@
 """
-The module compares 2 files and returns a dictionary with an internal
-representation of each key. The value of each key is a list of the form:
-list[0] = the actual value of the key
-list[1] = modification type
-    if list[1] == '=': The value of the key has either not changed,
-    or the key is a paren that is also present in the second file
-    if list[1] == '+': The key has been added in the second file
-    if list[1] == '-': Key has been removed in the second file
-    If the key is present in both files, but its value in the second file has
-    changed, 2 keys are output, the first one starts with 'REP-{key}' and
-    represents the value of the first file, the second with 'REP+{key}' and
-    represents the updated value.
-list[2] = The parent of the current node.
-    If the node is the root - the value is an empty string
+The module compares 2 files(json, yaml) and outputs the difference with an
+internal representation of each key. Output type - format dictionary:
+{key: name of key,
+ type: parent/children,
+ state: change/no change/removed/added,
+ value: key value,
+ }
 """
 
 from gendiff.formatters.formatter_data import data_handling as dh, \

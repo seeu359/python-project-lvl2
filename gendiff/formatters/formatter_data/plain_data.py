@@ -6,8 +6,16 @@ UPDATED = 'was updated. From'
 COMPLEX = '[complex value]'
 
 
-def format_root(data, result, path):
-    for node in data:
+def format_root(introduction, result, path):
+    """
+    Processes the root node and passes control to process the children
+    :param introduction: type(introduction) == dict. Internal representation
+    from diff
+    :param result: type(result) == list. Intermediate result
+    :param path: type(path) == str. Intermediate path to the changed node
+    :return: type str
+    """
+    for node in introduction:
         if node['type'] == 'children':
             result.append(format_child(node, path))
         if node['type'] == 'parent' and node['state'] == dh.STATE_NO_CHANGE:
