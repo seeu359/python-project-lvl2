@@ -1,16 +1,20 @@
-import argparse
+import json
+import yaml
 
 
-def get_parser_args():
-    parser = argparse.ArgumentParser(description='Compares two configuration'
-                                                 ' files and shows '
-                                                 'a difference. ')
-    parser.add_argument('first_file')
-    parser.add_argument('second_file')
-    parser.add_argument('-f', '--format',
-                        help='set format of output. Available output formats:'
-                             '1. stylish (default formatter); '
-                             '2. plain (-f plain); '
-                             '3. json (-f json)',
-                        default='stylish', choices=['stylish', 'plain', 'json'])
-    return parser.parse_args()
+def convert_data(path):
+    file_data, extension = get_file_data(path)
+    if extension == 'JSON':
+        return json.load(file_data)
+    if extension == 'YAML':
+        return yaml.safe_load(file_data)
+
+
+def get_file_data(path):
+    file = open(path)
+    file_extension = path.split('.')[-1]
+    if file_extension == 'json':
+        return file, 'JSON'
+    if file_extension == 'yaml' or file_extension == 'yml':
+        return file, 'YAML'
+    file.close()
