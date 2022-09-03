@@ -105,23 +105,21 @@ def format_child(node, indent):
     return result
 
 
-def nested_format(node, indents):
+def nested_format(node, indent):
     """
     Function that comprehensively handles a remote or added parent node with
     all children
     :param node: type(node) == dict.
-    :param indents: type(indents) == int.
+    :param indent: type(indents) == int.
     :return: type str.
     """
-    def node_processing(data, indent, result):
-        for key in data:
-            if isinstance(data[key], dict):
-                result.append(f"\n{' ' * indent}{key}: {{")
-                node_processing(data[key], indent + INDENT_STEP, result)
-            else:
-                result.append(f"\n{' ' * indent}{key}: "
-                              f"{vh.format_reduction(data[key], 'stylish')}")
-        result.append('\n' + ' ' * (indent - INDENT_STEP) + '}')
-        return ''.join(result).rstrip()
-
-    return node_processing(node, indents, [])
+    result = []
+    for key in node:
+        if isinstance(node[key], dict):
+            result.append(f"\n{' ' * indent}{key}: {{")
+            result.append(nested_format(node[key], indent + INDENT_STEP))
+        else:
+            result.append(f"\n{' ' * indent}{key}: "
+                          f"{vh.format_reduction(node[key], 'stylish')}")
+    result.append('\n' + ' ' * (indent - INDENT_STEP) + '}')
+    return ''.join(result).rstrip()
