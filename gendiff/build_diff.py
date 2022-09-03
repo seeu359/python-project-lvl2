@@ -31,16 +31,13 @@ def make_diff(file1_data, file2_data):
                 continue
         elif key in file1_data or key in file2_data:
             node = get_find_node(file1_data, file2_data, key)
-            node_type, value = ('parent', 'children') if \
+            node_type, format_key = ('parent', 'children') if \
                 isinstance(node[0][key], dict) else ('children', 'value')
-            if isinstance(node[0].get(key), dict):
-                result.append({'key': key,
-                               'type': node_type,
-                               'state': node[1],
-                               'children': node[0].get(key)
-                               })
-            else:
-                result.append(flat_structure_process(key, node))
+            result.append({'key': key,
+                           'type': node_type,
+                           'state': node[1],
+                           format_key: node[0].get(key)
+                           })
     return result
 
 
@@ -64,14 +61,6 @@ def compare_values(node1, node2, child):
                 'old_value': node1.get(child),
                 'new_value': node2.get(child),
                 }
-
-
-def flat_structure_process(root, node):
-    return {'key': root,
-            'type': 'children',
-            'state': node[1],
-            'value': node[0].get(root),
-            }
 
 
 def get_find_node(node1, node2, child):
