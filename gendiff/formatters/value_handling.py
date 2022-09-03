@@ -1,3 +1,5 @@
+
+
 def format_reduction(value, formatter):
     """
     Returns the value typed for the given formatter
