@@ -20,33 +20,34 @@ MARK = {'removed': ('- ', 2),
         'no change': ('', 0),
         }
 INDENT_STEP = 4
+CORRECT_INDENT = 2
 
 
-def stylish(introduction):
-    return format_root(introduction, ['{\n'], INDENT_STEP)
+def format_diff(diff):
+    return format_root(diff, ['{\n'], INDENT_STEP)
 
 
-def format_root(introduction, result, indent):
+def format_root(diff, result, indent):
     """
     The function, depending on the type of node, passes control to the handler
     functions
-    :param introduction: type(introduction) == dict. Takes an internal
+    :param diff: type(introduction) == dict. Takes an internal
     representation from the
     diff
     :param result: type(result) == list. Intermediate result.
     :param indent: type(indent) == dict. Default indent == 4
     :return: type(str)
     """
-    for data in introduction:
-        if data['type'] == 'parent' and data['state'] != bd.STATE_NO_CHANGE:
+    for data in diff:
+        if data['type'] == 'parent' and data['state'] != bd.STATE_NO_CHANGED:
             result.append(format_parent(data, indent))
-        if data['type'] == 'parent' and data['state'] == bd.STATE_NO_CHANGE:
+        if data['type'] == 'parent' and data['state'] == bd.STATE_NO_CHANGED:
             result.append(format_parent(data, indent))
             format_root(data.get('children'),
                         result, indent + INDENT_STEP)
         elif data['type'] == 'children':
             result.append(format_child(data, indent))
-    result.append(' ' * (indent - 4) + '}\n')
+    result.append(' ' * (indent - INDENT_STEP) + '}\n')
     return ''.join(result).strip()
 
 
@@ -61,7 +62,7 @@ def format_parent(node, indent):
     :param indent: type(indent) == int
     :return: type str
     """
-    if node['state'] == bd.STATE_NO_CHANGE:
+    if node['state'] == bd.STATE_NO_CHANGED:
         return f"{' ' * indent}{node['key']}: {{\n"
     else:
         margin = f"{' ' * (indent - MARK[node['state']][1])}"
@@ -73,7 +74,7 @@ def alocate_value(node, indent):
     if isinstance(node, dict):
         return nested_format(node, indent + INDENT_STEP)
     else:
-        return vh.format_reduction(node, 'stylish')
+        return format_specific_value(node)
 
 
 def format_child(node, indent):
@@ -90,18 +91,18 @@ def format_child(node, indent):
     :return: type str
     """
     result = ''
-    if node['state'] == bd.STATE_CHANGE:
+    if node['state'] == bd.STATE_CHANGED:
         bracket = '{' if isinstance(node['old_value'], dict) else ''
-        result += f"{' ' * (indent - 2)}- {node['key']}: {bracket}" \
-                  f"{alocate_value(node['old_value'], indent)}\n"
+        result += f"{' ' * (indent - CORRECT_INDENT)}- {node['key']}: " \
+                  f"{bracket}{alocate_value(node['old_value'], indent)}\n"
         bracket = '{' if isinstance(node['new_value'], dict) else ''
-        result += f"{' ' * (indent - 2)}+ {node['key']}: {bracket}" \
-                  f"{(alocate_value(node['new_value'], indent))}\n"
+        result += f"{' ' * (indent - CORRECT_INDENT)}+ {node['key']}: " \
+                  f"{bracket}{(alocate_value(node['new_value'], indent))}\n"
     else:
-        margin = ' ' * (indent - MARK[node['state']][1])
-        mark = MARK[node['state']][0]
+        mark, make_indent = MARK[node['state']]
+        margin = ' ' * (indent - make_indent)
         result += f"{margin}{mark}{node['key']}: " \
-                  f"{(vh.format_reduction(node['value'], 'stylish'))}\n"
+                  f"{(format_specific_value(node['value']))}\n"
     return result
 
 
@@ -120,6 +121,14 @@ def nested_format(node, indent):
             result.append(nested_format(node[key], indent + INDENT_STEP))
         else:
             result.append(f"\n{' ' * indent}{key}: "
-                          f"{vh.format_reduction(node[key], 'stylish')}")
+                          f"{format_specific_value(node[key])}")
     result.append('\n' + ' ' * (indent - INDENT_STEP) + '}')
     return ''.join(result).rstrip()
+
+
+def format_specific_value(value):
+    """
+    :param value: type(value) == str
+    :return: type str
+    """
+    return f'{str(value)}' if isinstance(value, str) else vh.format_value(value)

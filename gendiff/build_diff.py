@@ -1,9 +1,9 @@
 from collections import ChainMap
 
 
-STATE_NO_CHANGE = 'no change'
-STATE_CHANGE = 'changed'
-STATE_REMOTE = 'removed'
+STATE_NO_CHANGED = 'no change'
+STATE_CHANGED = 'changed'
+STATE_REMOVED = 'removed'
 STATE_ADDED = 'added'
 
 
@@ -21,7 +21,7 @@ def make_diff(file1_data, file2_data):
                (file2_data[key], dict)):
                 result.append({'key': key,
                                'type': 'parent',
-                               'state': STATE_NO_CHANGE,
+                               'state': STATE_NO_CHANGED,
                                'children': make_diff(file1_data.get(key),
                                                      file2_data.get(key))
                                })
@@ -30,13 +30,13 @@ def make_diff(file1_data, file2_data):
                 result.append(compare_values(file1_data, file2_data, key))
                 continue
         elif key in file1_data or key in file2_data:
-            node = get_find_node(file1_data, file2_data, key)
+            node, state = get_find_node(file1_data, file2_data, key)
             node_type, format_key = ('parent', 'children') if \
-                isinstance(node[0][key], dict) else ('children', 'value')
+                isinstance(node[key], dict) else ('children', 'value')
             result.append({'key': key,
                            'type': node_type,
-                           'state': node[1],
-                           format_key: node[0].get(key)
+                           'state': state,
+                           format_key: node[key]
                            })
     return result
 
@@ -51,13 +51,13 @@ def compare_values(node1, node2, child):
     if node1.get(child) == node2.get(child):
         return {'key': child,
                 'type': 'children',
-                'state': STATE_NO_CHANGE,
+                'state': STATE_NO_CHANGED,
                 'value': node1.get(child),
                 }
     else:
         return {'key': child,
                 'type': 'children',
-                'state': STATE_CHANGE,
+                'state': STATE_CHANGED,
                 'old_value': node1.get(child),
                 'new_value': node2.get(child),
                 }
@@ -65,6 +65,6 @@ def compare_values(node1, node2, child):
 
 def get_find_node(node1, node2, child):
     if child in node1:
-        return node1, STATE_REMOTE
+        return node1, STATE_REMOVED
     else:
         return node2, STATE_ADDED
