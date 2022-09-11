@@ -28,19 +28,19 @@ def test_generate_diff_stylish(path1, path2, expected):
     assert generate_diff(path1, path2) == expected
 
 
-@pytest.mark.parametrize('path1, path2, expected', [
-                             ('tests/fixtures/test_file_simple1.json',
-                              'tests/fixtures/test_file_simple2.json',
-                              get_fixture_data(
-                                  'tests/fixtures/result_plain_simple')),
-                             ('tests/fixtures/test_file_nested1.json',
-                              'tests/fixtures/test_file_nested2.json',
-                              get_fixture_data(
-                                  'tests/fixtures/result_plain_nested')),
-                             ('tests/fixtures/test_file_nested3.json',
-                              'tests/fixtures/test_file_nested4.json',
-                              get_fixture_data(
-                                  'tests/fixtures/result_plain_nested2'))]
+@pytest.mark.parametrize('path1, path2, expected',
+                         [('tests/fixtures/test_file_simple1.json',
+                           'tests/fixtures/test_file_simple2.json',
+                           get_fixture_data(
+                               'tests/fixtures/result_plain_simple')),
+                          ('tests/fixtures/test_file_nested1.json',
+                           'tests/fixtures/test_file_nested2.json',
+                           get_fixture_data(
+                               'tests/fixtures/result_plain_nested')),
+                          ('tests/fixtures/test_file_nested3.json',
+                           'tests/fixtures/test_file_nested4.json',
+                           get_fixture_data(
+                               'tests/fixtures/result_plain_nested2'))]
                          )
 def test_generate_diff_plain(path1, path2, expected):
     assert generate_diff(path1, path2, 'plain') == expected
