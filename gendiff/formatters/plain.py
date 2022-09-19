@@ -4,8 +4,7 @@ Property 'common.follow' was added with value: false
 Property 'common.setting2' was removed
 Property 'common.setting3' was updated. From true to [complex value]
 """
-
-from gendiff import build_diff as bd
+from gendiff import constants as const
 from gendiff.formatters import value_handling as vh
 
 ADDED = 'was added with value:'
@@ -28,15 +27,19 @@ def format_root(diff, result, path):
     :return: type str
     """
     for node in diff:
-        if node['type'] == 'children':
+        if node[const.TYPE] == const.TYPE_CHILDREN:
             result.append(format_child(node, path))
-        if node['type'] == 'parent' and node['state'] == bd.STATE_NO_CHANGED:
-            format_root(node['children'], result, f"{path}{node['key']}.")
-        elif node['type'] == 'parent' and node['state'] == bd.STATE_ADDED:
-            result.append(f"Property '{path}{node['key']}' "
+        if node[const.TYPE] == const.TYPE_PARENT and node[const.STATE] == \
+                const.STATE_NO_CHANGED:
+            format_root(node[const.TYPE_CHILDREN], result,
+                        f"{path}{node[const.KEY]}.")
+        elif node[const.TYPE] == const.TYPE_PARENT and node[const.STATE] == \
+                const.STATE_ADDED:
+            result.append(f"Property '{path}{node[const.KEY]}' "
                           f"{ADDED} {COMPLEX}\n")
-        elif node['type'] == 'parent' and node['state'] == bd.STATE_REMOVED:
-            result.append(f"Property '{path}{node['key']}' {REMOVED}\n")
+        elif node[const.TYPE] == const.TYPE_PARENT and node[const.STATE] == \
+                const.STATE_REMOVED:
+            result.append(f"Property '{path}{node[const.KEY]}' {REMOVED}\n")
 
     return ''.join(result).strip()
 
@@ -49,15 +52,15 @@ def format_child(node, path):
     :param path: type(path) == str. Path from parent's node to our key
     :return: type == str
     """
-    if node['state'] == bd.STATE_ADDED:
-        return f"Property '{path}{node['key']}' {ADDED} " \
-               f"{format_specific_value(node['value'])}\n"
-    elif node['state'] == bd.STATE_REMOVED:
-        return f"Property '{path}{node['key']}' {REMOVED}\n"
-    elif node['state'] == bd.STATE_CHANGED:
-        return f"Property '{path}{node['key']}' {UPDATED} " \
-               f"{format_specific_value(node['old_value'])} to " \
-               f"{format_specific_value(node['new_value'])}\n"
+    if node[const.STATE] == const.STATE_ADDED:
+        return f"Property '{path}{node[const.KEY]}' {ADDED} " \
+               f"{format_specific_value(node[const.VALUE])}\n"
+    elif node[const.STATE] == const.STATE_REMOVED:
+        return f"Property '{path}{node[const.KEY]}' {REMOVED}\n"
+    elif node[const.STATE] == const.STATE_CHANGED:
+        return f"Property '{path}{node[const.KEY]}' {UPDATED} " \
+               f"{format_specific_value(node[const.OLD_VALUE])} to " \
+               f"{format_specific_value(node[const.NEW_VALUE])}\n"
     else:
         return ''
 
@@ -68,7 +71,7 @@ def format_specific_value(value):
         :return: type str
     """
     if isinstance(value, dict):
-        return '[complex value]'
+        return COMPLEX
     elif isinstance(value, str):
         return f"'{str(value)}'"
     else:

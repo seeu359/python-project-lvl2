@@ -13,14 +13,15 @@ This formatter display difference between 2 files as:
 }
 """
 from gendiff.formatters import value_handling as vh
-from gendiff import build_diff as bd
+from gendiff import constants as const
 
-MARK = {'removed': ('- ', 2),
-        'added': ('+ ', 2),
-        'no change': ('', 0),
+CORRECT_INDENT = 2
+NO_NEED_CORRECT = 0
+MARK = {'removed': ('- ', CORRECT_INDENT),
+        'added': ('+ ', CORRECT_INDENT),
+        'no_change': ('', NO_NEED_CORRECT),
         }
 INDENT_STEP = 4
-CORRECT_INDENT = 2
 
 
 def format_diff(diff):
@@ -39,13 +40,15 @@ def format_root(diff, result, indent):
     :return: type(str)
     """
     for data in diff:
-        if data['type'] == 'parent' and data['state'] != bd.STATE_NO_CHANGED:
+        if data[const.TYPE] == const.TYPE_PARENT and data[const.STATE] != \
+                const.STATE_NO_CHANGED:
             result.append(format_parent(data, indent))
-        if data['type'] == 'parent' and data['state'] == bd.STATE_NO_CHANGED:
+        if data[const.TYPE] == const.TYPE_PARENT and data[const.STATE] == \
+                const.STATE_NO_CHANGED:
             result.append(format_parent(data, indent))
-            format_root(data.get('children'),
+            format_root(data.get(const.CHILDREN),
                         result, indent + INDENT_STEP)
-        elif data['type'] == 'children':
+        elif data[const.TYPE] == const.TYPE_CHILDREN:
             result.append(format_child(data, indent))
     result.append(' ' * (indent - INDENT_STEP) + '}\n')
     return ''.join(result).strip()
@@ -62,12 +65,12 @@ def format_parent(node, indent):
     :param indent: type(indent) == int
     :return: type str
     """
-    if node['state'] == bd.STATE_NO_CHANGED:
-        return f"{' ' * indent}{node['key']}: {{\n"
+    if node[const.STATE] == const.STATE_NO_CHANGED:
+        return f"{' ' * indent}{node[const.KEY]}: {{\n"
     else:
-        margin = f"{' ' * (indent - MARK[node['state']][1])}"
-        return f"{margin}{MARK[node['state']][0]}{node['key']}: {{" \
-               f"{alocate_value(node['children'], indent)}\n"
+        margin = f"{' ' * (indent - MARK[node[const.STATE]][1])}"
+        return f"{margin}{MARK[node[const.STATE]][0]}{node[const.KEY]}: {{" \
+               f"{alocate_value(node[const.CHILDREN], indent)}\n"
 
 
 def alocate_value(node, indent):
@@ -91,18 +94,18 @@ def format_child(node, indent):
     :return: type str
     """
     result = ''
-    if node['state'] == bd.STATE_CHANGED:
-        bracket = '{' if isinstance(node['old_value'], dict) else ''
-        result += f"{' ' * (indent - CORRECT_INDENT)}- {node['key']}: " \
-                  f"{bracket}{alocate_value(node['old_value'], indent)}\n"
-        bracket = '{' if isinstance(node['new_value'], dict) else ''
-        result += f"{' ' * (indent - CORRECT_INDENT)}+ {node['key']}: " \
-                  f"{bracket}{(alocate_value(node['new_value'], indent))}\n"
+    if node[const.STATE] == const.STATE_CHANGED:
+        bracket = '{' if isinstance(node[const.OLD_VALUE], dict) else ''
+        result += f"{' ' * (indent - CORRECT_INDENT)}- {node[const.KEY]}: " \
+                  f"{bracket}{alocate_value(node[const.OLD_VALUE], indent)}\n"
+        bracket = '{' if isinstance(node[const.NEW_VALUE], dict) else ''
+        result += f"{' ' * (indent - CORRECT_INDENT)}+ {node[const.KEY]}: " \
+                  f"{bracket}{(alocate_value(node[const.NEW_VALUE], indent))}\n"
     else:
-        mark, make_indent = MARK[node['state']]
+        mark, make_indent = MARK[node[const.STATE]]
         margin = ' ' * (indent - make_indent)
-        result += f"{margin}{mark}{node['key']}: " \
-                  f"{(format_specific_value(node['value']))}\n"
+        result += f"{margin}{mark}{node[const.KEY]}: " \
+                  f"{(format_specific_value(node[const.VALUE]))}\n"
     return result
 
 

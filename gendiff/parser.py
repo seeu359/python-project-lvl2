@@ -4,13 +4,14 @@ import yaml
 
 
 def get_file_data(path):
-    with open(path) as file_data:
-        return convert_data(path, file_data)
+    with open(path) as file:
+        file_data = file.read()
+    return file_data
 
 
-def convert_data(path, file_data):
+def convert_data(file_data, path):
     _, extension = os.path.splitext(path)
     if extension == '.json':
-        return json.load(file_data)
-    if extension == '.yaml' or extension == '.yml':
+        return json.loads(file_data)
+    if extension in ('.yaml', '.yml'):
         return yaml.safe_load(file_data)
