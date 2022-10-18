@@ -28,9 +28,9 @@ def generate_diff(file1, file2, format_name='stylish'):
     Default formatter is stylish.
     :return: type dict
     """
-    file1_data = parser.get_file_data(file1)
-    file2_data = parser.get_file_data(file2)
-    converted_file1_data = parser.convert_data(file1_data, file1)
-    converted_file2_data = parser.convert_data(file2_data, file2)
+    file1_data, file1_extension = parser.get_file_data(file1)
+    file2_data, file2_extension = parser.get_file_data(file2)
+    converted_file1_data = parser.convert_data(file1_data, file1_extension)
+    converted_file2_data = parser.convert_data(file2_data, file2_extension)
     return FORMATTER_SELECTION[format_name](bd.make_diff(converted_file1_data,
                                                          converted_file2_data))

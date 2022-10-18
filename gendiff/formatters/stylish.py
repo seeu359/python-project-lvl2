@@ -70,7 +70,7 @@ def format_parent(node, indent):
     else:
         margin = f"{' ' * (indent - MARK[node[const.STATE]][1])}"
         return f"{margin}{MARK[node[const.STATE]][0]}{node[const.KEY]}: {{" \
-               f"{alocate_value(node[const.CHILDREN], indent)}\n"
+               f"{alocate_value(node[const.VALUE], indent)}\n"
 
 
 def alocate_value(node, indent):

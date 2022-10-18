@@ -13,35 +13,35 @@ def make_diff(file1_data, file2_data):
     result = []
     keys_list = get_sorted_keys(file1_data, file2_data)
     for key in keys_list:
-        file1_key = file1_data.get(key, DEFAULT_VALUE)
-        file2_key = file2_data.get(key, DEFAULT_VALUE)
-        if file1_key is not DEFAULT_VALUE and file2_key is not DEFAULT_VALUE:
-            if isinstance(file1_key, dict) and isinstance(file2_key, dict):
+        file1_value = file1_data.get(key, DEFAULT_VALUE)
+        file2_value = file2_data.get(key, DEFAULT_VALUE)
+        if key in file1_data and key in file2_data:
+            if isinstance(file1_value, dict) and isinstance(file2_value, dict):
                 result.append({const.KEY: key,
                                const.TYPE: const.TYPE_PARENT,
                                const.STATE: const.STATE_NO_CHANGED,
-                               const.CHILDREN: make_diff(file1_key,
-                                                         file2_key)
+                               const.CHILDREN: make_diff(file1_value,
+                                                         file2_value)
                                })
             else:
                 result.append(compare_values(file1_data, file2_data, key))
-        elif file1_key is not DEFAULT_VALUE:
-            node_type, format_key = (const.TYPE_PARENT, const.CHILDREN) if \
-                isinstance(file1_key, dict) else (const.TYPE_CHILDREN,
-                                                  const.VALUE)
+        elif file1_value is not DEFAULT_VALUE:
+            node_type = const.TYPE_PARENT if isinstance(file1_value, dict) \
+                else const.TYPE_CHILDREN
+            format_key = const.VALUE
             result.append({const.KEY: key,
                            const.TYPE: node_type,
                            const.STATE: const.STATE_REMOVED,
-                           format_key: file1_key
+                           format_key: file1_value
                            })
-        elif file2_key is not DEFAULT_VALUE:
-            node_type, format_key = (const.TYPE_PARENT, const.CHILDREN) if \
-                isinstance(file2_key, dict) else (const.TYPE_CHILDREN,
-                                                  const.VALUE)
+        elif file2_value is not DEFAULT_VALUE:
+            node_type = const.TYPE_PARENT if isinstance(file2_value, dict) \
+                else const.TYPE_CHILDREN
+            format_key = const.VALUE
             result.append({const.KEY: key,
                            const.TYPE: node_type,
                            const.STATE: const.STATE_ADDED,
-                           format_key: file2_key
+                           format_key: file2_value
                            })
     return result
 
