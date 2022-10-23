@@ -15,3 +15,5 @@ def convert_data(file_data, extension):
         return json.loads(file_data)
     if extension in ('.yaml', '.yml'):
         return yaml.safe_load(file_data)
+    else:
+        raise TypeError

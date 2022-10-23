@@ -1,8 +1,6 @@
 from collections import ChainMap
 from gendiff import constants as const
 
-DEFAULT_VALUE = 'default_value_for_the_missing_key'
-
 
 def make_diff(file1_data, file2_data):
     """
@@ -13,8 +11,8 @@ def make_diff(file1_data, file2_data):
     result = []
     keys_list = get_sorted_keys(file1_data, file2_data)
     for key in keys_list:
-        file1_value = file1_data.get(key, DEFAULT_VALUE)
-        file2_value = file2_data.get(key, DEFAULT_VALUE)
+        file1_value = file1_data.get(key)
+        file2_value = file2_data.get(key)
         if key in file1_data and key in file2_data:
             if isinstance(file1_value, dict) and isinstance(file2_value, dict):
                 result.append({const.KEY: key,
@@ -25,7 +23,7 @@ def make_diff(file1_data, file2_data):
                                })
             else:
                 result.append(compare_values(file1_data, file2_data, key))
-        elif file1_value is not DEFAULT_VALUE:
+        elif file1_value is not None:
             node_type = const.TYPE_PARENT if isinstance(file1_value, dict) \
                 else const.TYPE_CHILDREN
             format_key = const.VALUE
@@ -34,7 +32,7 @@ def make_diff(file1_data, file2_data):
                            const.STATE: const.STATE_REMOVED,
                            format_key: file1_value
                            })
-        elif file2_value is not DEFAULT_VALUE:
+        elif file2_value is not None:
             node_type = const.TYPE_PARENT if isinstance(file2_value, dict) \
                 else const.TYPE_CHILDREN
             format_key = const.VALUE
