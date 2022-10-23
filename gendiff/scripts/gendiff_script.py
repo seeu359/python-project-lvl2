@@ -11,6 +11,5 @@ def main():
         print('One of the file types is not supported!')
 
 
-
 if __name__ == '__main__':
     main()
